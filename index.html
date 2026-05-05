@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>한글 — Learn to Read Korean</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header>
+  <h1><span>한글</span> Flash</h1>
+  <p>Build your Korean reading speed</p>
+</header>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" data-tab="practice">Practice</button>
+  <button class="nav-tab"        data-tab="quiz">Quiz</button>
+  <button class="nav-tab"        data-tab="theory">Theory</button>
+</div>
+
+<!-- Setup -->
+<div id="setup">
+  <div class="card">
+    <h2>Level</h2>
+    <div class="level-grid">
+      <button class="level-btn active" data-level="1">
+        <div class="lv-num">Level 1</div>
+        <div class="lv-title">Letters</div>
+        <div class="lv-example">ㄱ ㅏ ㄴ</div>
+      </button>
+      <button class="level-btn" data-level="2">
+        <div class="lv-num">Level 2</div>
+        <div class="lv-title">Syllables</div>
+        <div class="lv-example">한 가 나</div>
+      </button>
+      <button class="level-btn" data-level="3">
+        <div class="lv-num">Level 3</div>
+        <div class="lv-title">Words</div>
+        <div class="lv-example">하늘 물 나무</div>
+      </button>
+      <button class="level-btn" data-level="4">
+        <div class="lv-num">Level 4</div>
+        <div class="lv-title">Sentences</div>
+        <div class="lv-example">나는 학생이에요</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="card" id="timerCard">
+    <h2>Timer</h2>
+    <div class="timer-group">
+      <button class="timer-btn active" data-timer="0">No timer</button>
+      <button class="timer-btn" data-timer="3">3 sec</button>
+      <button class="timer-btn" data-timer="10">10 sec</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Cards per round</h2>
+    <div class="round-group">
+      <label>Cards</label>
+      <input type="range" id="roundSlider" min="5" max="30" step="5" value="10" />
+      <span id="roundVal">10</span>
+    </div>
+  </div>
+
+  <button class="start-btn" id="startBtn">Start Round →</button>
+</div>
+
+<!-- Flash -->
+<div id="flash">
+  <div class="progress-row">
+    <span id="cardCounter">1 / 10</span>
+    <span id="levelLabel">Level 1 · Letters</span>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+  </div>
+  <div class="timer-bar-wrap" id="timerBarWrap" style="display:none">
+    <div class="timer-bar-fill" id="timerBar" style="width:100%"></div>
+  </div>
+  <div class="flash-card" id="flashCard">
+    <button class="speak-btn" id="speakBtn" aria-label="Play pronunciation">🔊</button>
+    <div class="korean" id="koreanText">-</div>
+    <div class="romanization" id="romanText"></div>
+    <div class="meaning" id="meaningText"></div>
+    <div class="tap-hint">tap to reveal</div>
+  </div>
+  <div class="action-row">
+    <button class="grade-btn hard" id="btnHard" disabled>😓 Hard</button>
+    <button class="grade-btn ok"   id="btnOk"   disabled>😐 OK</button>
+    <button class="grade-btn easy" id="btnEasy"  disabled>😊 Easy</button>
+  </div>
+  <button class="leave-btn" id="btnLeave">← Leave round</button>
+</div>
+
+<!-- Results -->
+<div id="results">
+  <div class="results-header">
+    <div class="score" id="scoreText">80%</div>
+    <p id="scoreSubtext">Nice work!</p>
+  </div>
+  <div class="stats-row">
+    <div class="stat-box hard"><div class="num" id="statHard">0</div><div class="lbl">Hard</div></div>
+    <div class="stat-box ok">  <div class="num" id="statOk">0</div>  <div class="lbl">OK</div></div>
+    <div class="stat-box easy"><div class="num" id="statEasy">0</div><div class="lbl">Easy</div></div>
+  </div>
+  <div class="missed-list" id="missedSection">
+    <h2>Review these</h2>
+    <div class="missed-items" id="missedItems"></div>
+  </div>
+  <div class="results-actions">
+    <button class="btn-retry" id="btnRetry">↩ Retry level</button>
+    <button class="btn-next"  id="btnNext">Next level →</button>
+  </div>
+  <button class="leave-btn" id="btnHome">← Back to start</button>
+</div>
+
+<!-- Quiz -->
+<div id="quiz">
+  <div class="progress-row">
+    <span id="quizCounter">1 / 10</span>
+    <span id="quizLevelLabel">Level 1 · Letters</span>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="quizProgressBar" style="width:0%"></div>
+  </div>
+  <div class="quiz-card">
+    <button class="speak-btn" id="quizSpeakBtn" aria-label="Play pronunciation">🔊</button>
+    <div class="korean" id="quizKoreanText">-</div>
+  </div>
+  <div class="quiz-options" id="quizOptions"></div>
+  <button class="quiz-next-btn" id="quizNextBtn" style="display:none">Next →</button>
+  <button class="leave-btn" id="quizLeaveBtn">← Leave quiz</button>
+</div>
+
+<!-- Quiz results -->
+<div id="quizResults">
+  <div class="results-header">
+    <div class="score" id="quizScoreText">8 / 10</div>
+    <p id="quizScoreSubtext">Great work!</p>
+  </div>
+  <div class="missed-list" id="quizMissedSection">
+    <h2>Review these</h2>
+    <div class="missed-items" id="quizMissedItems"></div>
+  </div>
+  <div class="results-actions">
+    <button class="btn-retry" id="quizBtnHome">← Menu</button>
+    <button class="btn-next"  id="quizBtnRetry">↩ Retry</button>
+  </div>
+</div>
+
+<!-- Theory -->
+<div id="theory">
+
+  <div class="theory-section">
+    <h2>How Hangul works</h2>
+    <p>Korean is written in syllable blocks. Each block is made of 2–3 letters stacked together: an initial consonant (초성), a vowel (중성), and an optional final consonant (받침).</p>
+    <div class="syllable-demo">
+      <div class="syl-box">
+        <span class="big">가</span>
+        <span class="breakdown">ㄱ + ㅏ</span>
+        <span class="meaning-note">ga</span>
+      </div>
+      <div class="syl-box">
+        <span class="big">한</span>
+        <span class="breakdown">ㅎ + ㅏ + ㄴ</span>
+        <span class="meaning-note">han</span>
+      </div>
+      <div class="syl-box">
+        <span class="big">글</span>
+        <span class="breakdown">ㄱ + ㅡ + ㄹ</span>
+        <span class="meaning-note">geul</span>
+      </div>
+      <div class="syl-box">
+        <span class="big">닭</span>
+        <span class="breakdown">ㄷ + ㅏ + ㄹ + ㄱ</span>
+        <span class="meaning-note">dak — chicken</span>
+      </div>
+    </div>
+    <div class="tip-box" style="margin-top:14px">
+      ㅇ is silent at the start of a syllable (acts as a placeholder when the syllable begins with a vowel), but sounds like <em>ng</em> at the end — e.g. 방 (bang).
+    </div>
+  </div>
+
+  <div class="theory-section">
+    <h2>Basic consonants — 자음</h2>
+    <div class="alpha-grid cols-4">
+      <div class="alpha-cell"><span class="char">ㄱ</span><span class="rom">g / k</span></div>
+      <div class="alpha-cell"><span class="char">ㄴ</span><span class="rom">n</span></div>
+      <div class="alpha-cell"><span class="char">ㄷ</span><span class="rom">d / t</span></div>
+      <div class="alpha-cell"><span class="char">ㄹ</span><span class="rom">r / l</span></div>
+      <div class="alpha-cell"><span class="char">ㅁ</span><span class="rom">m</span></div>
+      <div class="alpha-cell"><span class="char">ㅂ</span><span class="rom">b / p</span></div>
+      <div class="alpha-cell"><span class="char">ㅅ</span><span class="rom">s</span></div>
+      <div class="alpha-cell"><span class="char">ㅇ</span><span class="rom">silent / ng</span></div>
+      <div class="alpha-cell"><span class="char">ㅈ</span><span class="rom">j</span></div>
+      <div class="alpha-cell"><span class="char">ㅊ</span><span class="rom">ch</span></div>
+      <div class="alpha-cell"><span class="char">ㅋ</span><span class="rom">k</span></div>
+      <div class="alpha-cell"><span class="char">ㅌ</span><span class="rom">t</span></div>
+      <div class="alpha-cell"><span class="char">ㅍ</span><span class="rom">p</span></div>
+      <div class="alpha-cell"><span class="char">ㅎ</span><span class="rom">h</span></div>
+    </div>
+  </div>
+
+  <div class="theory-section">
+    <h2>Tense (double) consonants — 된소리</h2>
+    <p>Produced with extra tension. Harder, sharper sound — no aspiration.</p>
+    <div class="alpha-grid cols-3">
+      <div class="alpha-cell"><span class="char">ㄲ</span><span class="rom">kk</span><span class="note">tense ㄱ</span></div>
+      <div class="alpha-cell"><span class="char">ㄸ</span><span class="rom">tt</span><span class="note">tense ㄷ</span></div>
+      <div class="alpha-cell"><span class="char">ㅃ</span><span class="rom">pp</span><span class="note">tense ㅂ</span></div>
+      <div class="alpha-cell"><span class="char">ㅆ</span><span class="rom">ss</span><span class="note">tense ㅅ</span></div>
+      <div class="alpha-cell"><span class="char">ㅉ</span><span class="rom">jj</span><span class="note">tense ㅈ</span></div>
+    </div>
+  </div>
+
+  <div class="theory-section">
+    <h2>Basic vowels — 모음</h2>
+    <div class="alpha-grid cols-4">
+      <div class="alpha-cell"><span class="char">ㅏ</span><span class="rom">a</span><span class="note">like "ah"</span></div>
+      <div class="alpha-cell"><span class="char">ㅓ</span><span class="rom">eo</span><span class="note">like "uh"</span></div>
+      <div class="alpha-cell"><span class="char">ㅗ</span><span class="rom">o</span><span class="note">like "oh"</span></div>
+      <div class="alpha-cell"><span class="char">ㅜ</span><span class="rom">u</span><span class="note">like "oo"</span></div>
+      <div class="alpha-cell"><span class="char">ㅡ</span><span class="rom">eu</span><span class="note">like "uh" lips flat</span></div>
+      <div class="alpha-cell"><span class="char">ㅣ</span><span class="rom">i</span><span class="note">like "ee"</span></div>
+      <div class="alpha-cell"><span class="char">ㅐ</span><span class="rom">ae</span><span class="note">like "eh"</span></div>
+      <div class="alpha-cell"><span class="char">ㅔ</span><span class="rom">e</span><span class="note">like "eh"</span></div>
+    </div>
+  </div>
+
+  <div class="theory-section">
+    <h2>Y- vowels</h2>
+    <div class="alpha-grid cols-4">
+      <div class="alpha-cell"><span class="char">ㅑ</span><span class="rom">ya</span></div>
+      <div class="alpha-cell"><span class="char">ㅕ</span><span class="rom">yeo</span></div>
+      <div class="alpha-cell"><span class="char">ㅛ</span><span class="rom">yo</span></div>
+      <div class="alpha-cell"><span class="char">ㅠ</span><span class="rom">yu</span></div>
+      <div class="alpha-cell"><span class="char">ㅒ</span><span class="rom">yae</span></div>
+      <div class="alpha-cell"><span class="char">ㅖ</span><span class="rom">ye</span></div>
+    </div>
+  </div>
+
+  <div class="theory-section">
+    <h2>Compound vowels — 이중모음</h2>
+    <p>Formed by combining two basic vowels.</p>
+    <div class="alpha-grid cols-4">
+      <div class="alpha-cell"><span class="char">ㅘ</span><span class="rom">wa</span><span class="note">ㅗ + ㅏ</span></div>
+      <div class="alpha-cell"><span class="char">ㅙ</span><span class="rom">wae</span><span class="note">ㅗ + ㅐ</span></div>
+      <div class="alpha-cell"><span class="char">ㅚ</span><span class="rom">oe</span><span class="note">ㅗ + ㅣ</span></div>
+      <div class="alpha-cell"><span class="char">ㅝ</span><span class="rom">wo</span><span class="note">ㅜ + ㅓ</span></div>
+      <div class="alpha-cell"><span class="char">ㅞ</span><span class="rom">we</span><span class="note">ㅜ + ㅔ</span></div>
+      <div class="alpha-cell"><span class="char">ㅟ</span><span class="rom">wi</span><span class="note">ㅜ + ㅣ</span></div>
+      <div class="alpha-cell"><span class="char">ㅢ</span><span class="rom">ui</span><span class="note">ㅡ + ㅣ</span></div>
+    </div>
+  </div>
+
+  <div class="theory-section">
+    <h2>Reading order</h2>
+    <p>Within a syllable block, read left → right, top → bottom:</p>
+    <div class="syllable-demo">
+      <div class="syl-box">
+        <span class="big">나</span>
+        <span class="breakdown">ㄴ + ㅏ</span>
+        <span class="meaning-note">na — initial + vertical vowel</span>
+      </div>
+      <div class="syl-box">
+        <span class="big">고</span>
+        <span class="breakdown">ㄱ + ㅗ</span>
+        <span class="meaning-note">go — initial + horizontal vowel</span>
+      </div>
+      <div class="syl-box">
+        <span class="big">산</span>
+        <span class="breakdown">ㅅ + ㅏ + ㄴ</span>
+        <span class="meaning-note">san — mountain</span>
+      </div>
+      <div class="syl-box">
+        <span class="big">봐</span>
+        <span class="breakdown">ㅂ + ㅘ</span>
+        <span class="meaning-note">bwa — compound vowel</span>
+      </div>
+      <div class="syl-box">
+        <span class="big">닭</span>
+        <span class="breakdown">ㄷ + ㅏ + ㄺ</span>
+        <span class="meaning-note">dak — double final consonant</span>
+      </div>
+      <div class="syl-box">
+        <span class="big">읽</span>
+        <span class="breakdown">ㅇ + ㅣ + ㄺ</span>
+        <span class="meaning-note">ilk — to read (verb stem)</span>
+      </div>
+    </div>
+    <div class="tip-box" style="margin-top:14px">
+      <strong style="color:var(--purple)">Vertical vowels</strong> (ㅏ ㅓ ㅣ ㅐ…) go to the <em>right</em> of the consonant: ㄴ + ㅏ → 나<br><br>
+      <strong style="color:var(--purple)">Horizontal vowels</strong> (ㅗ ㅜ ㅡ…) go <em>below</em> the consonant: ㄱ + ㅗ → 고<br><br>
+      <strong style="color:var(--purple)">Final consonant (받침)</strong> always sits at the bottom of the block: ㅅ + ㅏ + ㄴ → 산<br><br>
+      <strong style="color:var(--purple)">Double final consonants (겹받침)</strong> — only one is usually pronounced. In 닭 (chicken), ㄺ = ㄹ + ㄱ, but you say <span style="color:var(--blue)">dak</span>.
+    </div>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
