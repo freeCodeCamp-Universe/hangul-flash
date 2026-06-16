@@ -7,7 +7,36 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=3" />
+  <style>
+    #setup {
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas: "level timer" "level cards" "start start";
+      width: 100%;
+      max-width: 860px;
+      gap: 20px;
+    }
+    #setup > .card:first-child  { grid-area: level; }
+    #setup > .card:nth-child(2) { grid-area: timer; }
+    #setup > .card:nth-child(3) { grid-area: cards; }
+    #setup > .start-btn {
+      grid-area: start;
+      justify-self: center;
+      width: 50%;
+      min-width: 260px;
+    }
+    @media (min-width: 600px) {
+      .nav-tabs { width: 100%; max-width: 860px; }
+    }
+    @media (max-width: 480px) {
+      #setup {
+        grid-template-columns: 1fr;
+        grid-template-areas: "level" "timer" "cards" "start";
+        max-width: 520px;
+      }
+      #setup > .start-btn { width: 100%; justify-self: auto; }
+    }
+  </style>
   <script>if(localStorage.getItem('theme')==='light')document.documentElement.dataset.theme='light';</script>
 </head>
 <body>
@@ -57,7 +86,7 @@
     <h2>Timer</h2>
     <div class="timer-group">
       <button class="timer-btn active" data-timer="0">No timer</button>
-      <button class="timer-btn" data-timer="3">3 sec</button>
+      <button class="timer-btn" data-timer="5">5 sec</button>
       <button class="timer-btn" data-timer="10">10 sec</button>
     </div>
   </div>
@@ -131,6 +160,9 @@
   </div>
   <div class="progress-bar-wrap">
     <div class="progress-bar-fill" id="quizProgressBar" style="width:0%"></div>
+  </div>
+  <div class="timer-bar-wrap" id="quizTimerBarWrap" style="display:none">
+    <div class="timer-bar-fill" id="quizTimerBar" style="width:100%"></div>
   </div>
   <div class="quiz-card">
     <button class="speak-btn" id="quizSpeakBtn" aria-label="Play pronunciation">🔊</button>

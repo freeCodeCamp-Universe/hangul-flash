@@ -110,7 +110,7 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
     if (activeTab === 'theory') {
       show('theory');
     } else if (activeTab === 'quiz') {
-      document.getElementById('timerCard').style.display = 'none';
+      document.getElementById('timerCard').style.display = '';
       document.getElementById('startBtn').textContent = 'Start Quiz →';
       show('setup');
     } else {
@@ -333,6 +333,20 @@ const LEVEL_NAMES = { 1:'Letters', 2:'Syllables', 3:'Words', 4:'Sentences' };
 let config = { level: 1, timer: 0, rounds: 10 };
 let session = { queue: [], idx: 0, grades: [], timerHandle: null, timerRemaining: 0 };
 
+function saveConfig() {
+  localStorage.setItem('hangul-config', JSON.stringify(config));
+}
+
+(function loadConfig() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('hangul-config'));
+    if (!saved) return;
+    if (saved.level) config.level = saved.level;
+    if (saved.timer !== undefined) config.timer = saved.timer;
+    if (saved.rounds) config.rounds = saved.rounds;
+  } catch (e) {}
+})();
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function shuffle(arr) {
@@ -346,10 +360,12 @@ function shuffle(arr) {
 
 const SCREENS = ['setup','flash','results','theory','quiz','quizResults'];
 
+const SCREEN_DISPLAY = { setup: 'grid' };
+
 function show(id) {
   SCREENS.forEach(s => {
     const el = document.getElementById(s);
-    if (el) el.style.display = s === id ? 'flex' : 'none';
+    if (el) el.style.display = s === id ? (SCREEN_DISPLAY[s] || 'flex') : 'none';
   });
 }
 
@@ -360,6 +376,7 @@ document.querySelectorAll('.level-btn').forEach(btn => {
     document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     config.level = +btn.dataset.level;
+    saveConfig();
   });
 });
 
@@ -368,6 +385,7 @@ document.querySelectorAll('.timer-btn').forEach(btn => {
     document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     config.timer = +btn.dataset.timer;
+    saveConfig();
   });
 });
 
@@ -376,7 +394,14 @@ const roundVal = document.getElementById('roundVal');
 slider.addEventListener('input', () => {
   roundVal.textContent = slider.value;
   config.rounds = +slider.value;
+  saveConfig();
 });
+
+// Apply loaded config to UI
+document.querySelectorAll('.level-btn').forEach(b => b.classList.toggle('active', +b.dataset.level === config.level));
+document.querySelectorAll('.timer-btn').forEach(b => b.classList.toggle('active', +b.dataset.timer === config.timer));
+slider.value = config.rounds;
+roundVal.textContent = config.rounds;
 
 document.getElementById('startBtn').addEventListener('click', () => {
   if (activeTab === 'quiz') startQuiz();
@@ -563,7 +588,7 @@ document.getElementById('btnHome').addEventListener('click', () => {
 
 // ── Quiz ──────────────────────────────────────────────────────────────────────
 
-let quizSession = { queue: [], idx: 0, results: [] };
+let quizSession = { queue: [], idx: 0, results: [], timerHandle: null };
 
 function getOptionLabel(card) {
   if (config.level === 1) return card.r;
@@ -582,7 +607,37 @@ function startQuiz() {
   showQuizQuestion();
 }
 
+function startQuizTimer(correctK) {
+  const bar = document.getElementById('quizTimerBar');
+  const total = config.timer * 1000;
+  let start = null;
+
+  function tick(ts) {
+    if (!start) start = ts;
+    const pct = Math.max(0, 1 - (ts - start) / total);
+    bar.style.width = `${pct * 100}%`;
+    bar.style.background = pct > 0.4 ? '#acd157' : pct > 0.15 ? '#ffc300' : '#ffadad';
+    if (pct > 0) {
+      quizSession.timerHandle = requestAnimationFrame(tick);
+    } else {
+      handleOptionClick(null, false, correctK);
+    }
+  }
+
+  quizSession.timerHandle = requestAnimationFrame(tick);
+}
+
+function clearQuizTimer() {
+  if (quizSession.timerHandle) {
+    cancelAnimationFrame(quizSession.timerHandle);
+    quizSession.timerHandle = null;
+  }
+  const bar = document.getElementById('quizTimerBar');
+  if (bar) { bar.style.width = '100%'; bar.style.background = 'var(--green)'; }
+}
+
 function showQuizQuestion() {
+  clearQuizTimer();
   const card = quizSession.queue[quizSession.idx];
   const total = quizSession.queue.length;
   const current = quizSession.idx + 1;
@@ -608,14 +663,22 @@ function showQuizQuestion() {
     btn.addEventListener('click', () => handleOptionClick(btn, opt.k === card.k, card.k));
     container.appendChild(btn);
   });
+
+  if (config.timer > 0) {
+    document.getElementById('quizTimerBarWrap').style.display = 'block';
+    startQuizTimer(card.k);
+  } else {
+    document.getElementById('quizTimerBarWrap').style.display = 'none';
+  }
 }
 
 function handleOptionClick(selectedBtn, isCorrect, correctK) {
+  clearQuizTimer();
   document.getElementById('quizOptions').querySelectorAll('.quiz-option').forEach(btn => {
     btn.disabled = true;
     if (btn.dataset.k === correctK) btn.classList.add('correct');
   });
-  if (!isCorrect) selectedBtn.classList.add('wrong');
+  if (selectedBtn && !isCorrect) selectedBtn.classList.add('wrong');
   isCorrect ? playCorrect() : playWrong();
   quizSession.results.push({ card: quizSession.queue[quizSession.idx], correct: isCorrect });
   document.getElementById('quizNextBtn').style.display = 'block';
@@ -658,7 +721,23 @@ document.getElementById('quizSpeakBtn').addEventListener('click', e => {
   speak(document.getElementById('quizKoreanText').textContent, e.currentTarget);
 });
 
-document.getElementById('quizLeaveBtn').addEventListener('click', () => show('setup'));
+document.getElementById('quizLeaveBtn').addEventListener('click', () => { clearQuizTimer(); show('setup'); });
+
+// ── Theory audio ──────────────────────────────────────────────────────────────
+
+document.getElementById('theory').addEventListener('click', e => {
+  const cell = e.target.closest('.alpha-cell, .syl-box');
+  if (cell) {
+    const charEl = cell.querySelector('.char, .big');
+    if (charEl) speak(charEl.textContent.trim());
+    return;
+  }
+  const row = e.target.closest('.alpha-table tr');
+  if (row) {
+    const charTd = row.querySelector('.char');
+    if (charTd) speak(charTd.textContent.trim());
+  }
+});
 document.getElementById('quizBtnHome').addEventListener('click', () => show('setup'));
 document.getElementById('quizBtnRetry').addEventListener('click', () => startQuiz());
 
