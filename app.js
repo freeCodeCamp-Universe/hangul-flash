@@ -383,6 +383,39 @@ function shuffle(arr) {
   return a;
 }
 
+function getMisses() {
+  try { return JSON.parse(localStorage.getItem('hangul-misses') || '{}'); }
+  catch { return {}; }
+}
+
+function recordMiss(cardKey, outcome) {
+  const misses = getMisses();
+  if (outcome === 'hard' || outcome === 'wrong') {
+    misses[cardKey] = (misses[cardKey] || 0) + 1;
+  } else if (outcome === 'easy' || outcome === 'correct') {
+    misses[cardKey] = Math.max(0, (misses[cardKey] || 0) - 1);
+  }
+  localStorage.setItem('hangul-misses', JSON.stringify(misses));
+}
+
+function weightedQueue(pool, count) {
+  const misses = getMisses();
+  const struggling = shuffle(pool.filter(c => (misses[c.k] || 0) > 0));
+  const fresh      = shuffle(pool.filter(c => !(misses[c.k] || 0)));
+  return [...struggling, ...fresh].slice(0, Math.min(count, pool.length));
+}
+
+function practiceAnnouncement(pct, counts) {
+  const n = counts.hard;
+  const review = n > 0 ? ` Review ${n} card${n !== 1 ? 's' : ''} below.` : '';
+  return `Round complete. Score ${pct}%. ${counts.easy} easy, ${counts.ok} OK, ${n} hard.${review}`;
+}
+
+function quizAnnouncement(correct, total, missed) {
+  const review = missed > 0 ? ` Review ${missed} card${missed !== 1 ? 's' : ''} below.` : '';
+  return `Quiz complete. ${correct} of ${total} correct.${review}`;
+}
+
 const SCREENS = ['setup','flash','results','theory','quiz','quizResults'];
 const SCREEN_DISPLAY = { setup: 'grid' };
 const SCREEN_TITLES = {
@@ -474,9 +507,11 @@ document.getElementById('startBtn').addEventListener('click', () => {
 
 function startSession() {
   const pool = DATA[config.level];
-  session.queue = shuffle(pool).slice(0, config.rounds);
+  session.queue = weightedQueue(pool, config.rounds);
   session.idx = 0;
   session.grades = [];
+  session.requeued = new Set();
+  session.total = session.queue.length;
   show('flash');
   document.getElementById('levelLabel').textContent =
     `Level ${config.level} · ${LEVEL_NAMES[config.level]}`;
@@ -487,10 +522,9 @@ function startSession() {
 function showCard() {
   clearTimer();
   const card = session.queue[session.idx];
-  const total = session.queue.length;
   const current = session.idx + 1;
 
-  document.getElementById('cardCounter').textContent = `${current} / ${total}`;
+  document.getElementById('cardCounter').textContent = `${current} / ${session.total}`;
 
   const flashCard = document.getElementById('flashCard');
   flashCard.classList.remove('revealed');
@@ -541,7 +575,19 @@ document.getElementById('speakBtn').addEventListener('click', e => {
   const grades = ['hard','ok','easy'];
   document.getElementById(id).addEventListener('click', function() {
     if (this.getAttribute('aria-disabled') === 'true') return;
-    session.grades.push({ card: session.queue[session.idx], grade: grades[i] });
+    const card = session.queue[session.idx];
+    const grade = grades[i];
+    session.grades.push({ card, grade });
+    recordMiss(card.k, grade);
+
+    if (grade === 'hard' && !session.requeued.has(card.k)) {
+      session.requeued.add(card.k);
+      const remaining = session.queue.length - session.idx - 1;
+      const insertAt = session.idx + 1 + (remaining > 0 ? Math.floor(Math.random() * Math.min(remaining, 3)) : 0);
+      session.queue.splice(insertAt, 0, card);
+      announce('Card added back to the deck.');
+    }
+
     session.idx++;
     if (session.idx < session.queue.length) {
       showCard();
@@ -616,15 +662,22 @@ function showResults() {
   missedItems.innerHTML = '';
   const section = document.getElementById('missedSection');
   section.style.display = missed.length > 0 ? 'block' : 'none';
+  const missedHeading = section.querySelector('h2');
+  if (missedHeading) missedHeading.textContent = `Review these (${missed.length})`;
 
   missed.forEach(c => {
     const el = document.createElement('div');
     el.className = 'missed-item';
-    el.innerHTML = `<span>${c.k}</span><span class="rom">${c.r}${c.m ? ' · ' + c.m : ''}</span>`;
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('aria-label', `${c.k}, ${c.r}. Tap to hear`);
+    el.innerHTML = `<span class="missed-char" lang="ko">${c.k}</span><span class="rom">${c.r}${c.m ? ' · ' + c.m : ''}</span>`;
+    el.addEventListener('click', () => speak(c.k, el));
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); speak(c.k, el); } });
     missedItems.appendChild(el);
   });
 
-  announce(`Round complete. Score ${pct}%. ${counts.easy} easy, ${counts.ok} OK, ${counts.hard} hard.`);
+  announce(practiceAnnouncement(pct, counts));
   show('results');
 }
 
@@ -653,7 +706,7 @@ function getOptionLabel(card) {
 
 function startQuiz() {
   const pool = DATA[config.level];
-  quizSession.queue = shuffle(pool).slice(0, config.rounds);
+  quizSession.queue = weightedQueue(pool, config.rounds);
   quizSession.idx = 0;
   quizSession.results = [];
   show('quiz');
@@ -746,7 +799,9 @@ function handleOptionClick(selectedBtn, isCorrect, correctK) {
   } else {
     announce(`Time's up. Correct answer: ${correctLabel}`);
   }
-  quizSession.results.push({ card: quizSession.queue[quizSession.idx], correct: isCorrect });
+  const quizCard = quizSession.queue[quizSession.idx];
+  quizSession.results.push({ card: quizCard, correct: isCorrect });
+  recordMiss(quizCard.k, isCorrect ? 'correct' : 'wrong');
   document.getElementById('quizNextBtn').style.display = 'block';
 }
 
@@ -764,16 +819,24 @@ function showQuizResults() {
   const missed = quizSession.results.filter(r => !r.correct).map(r => r.card);
   const missedItems = document.getElementById('quizMissedItems');
   missedItems.innerHTML = '';
-  document.getElementById('quizMissedSection').style.display = missed.length ? 'block' : 'none';
+  const quizMissedSection = document.getElementById('quizMissedSection');
+  quizMissedSection.style.display = missed.length ? 'block' : 'none';
+  const quizMissedHeading = quizMissedSection.querySelector('h2');
+  if (quizMissedHeading) quizMissedHeading.textContent = `Review these (${missed.length})`;
 
   missed.forEach(c => {
     const el = document.createElement('div');
     el.className = 'missed-item';
-    el.innerHTML = `<span>${c.k}</span><span class="rom">${c.r}${c.m ? ' · ' + c.m : ''}</span>`;
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('aria-label', `${c.k}, ${c.r}. Tap to hear`);
+    el.innerHTML = `<span class="missed-char" lang="ko">${c.k}</span><span class="rom">${c.r}${c.m ? ' · ' + c.m : ''}</span>`;
+    el.addEventListener('click', () => speak(c.k, el));
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); speak(c.k, el); } });
     missedItems.appendChild(el);
   });
 
-  announce(`Quiz complete. ${correct} of ${total} correct.`);
+  announce(quizAnnouncement(correct, total, missed.length));
   show('quizResults');
 }
 
