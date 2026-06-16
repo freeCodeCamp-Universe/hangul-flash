@@ -1,3 +1,31 @@
+// ── Theme toggle ──────────────────────────────────────────────────────────────
+
+(function () {
+  const btn = document.getElementById('themeToggle');
+
+  function applyTheme(light) {
+    if (light) {
+      document.documentElement.dataset.theme = 'light';
+      btn.textContent = '🌙';
+      btn.setAttribute('aria-label', 'Switch to dark theme');
+    } else {
+      delete document.documentElement.dataset.theme;
+      btn.textContent = '☀️';
+      btn.setAttribute('aria-label', 'Switch to light theme');
+    }
+    localStorage.setItem('theme', light ? 'light' : 'dark');
+  }
+
+  if (document.documentElement.dataset.theme === 'light') {
+    btn.textContent = '🌙';
+    btn.setAttribute('aria-label', 'Switch to dark theme');
+  }
+
+  btn.addEventListener('click', () => {
+    applyTheme(document.documentElement.dataset.theme !== 'light');
+  });
+})();
+
 // ── Text-to-speech ────────────────────────────────────────────────────────────
 
 const SPEAK_OVERRIDE = {

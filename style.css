@@ -31,6 +31,34 @@
   --muted:   var(--gray-45);
   --accent:  var(--purple);
   --radius: 16px;
+
+  /* tint backgrounds for hover/active states */
+  --tint-purple: #1f1b2e;
+  --tint-blue:   #0f1a28;
+  --tint-red:    #1e0f0f;
+  --tint-yellow: #1e1800;
+  --tint-green:  #141e0a;
+}
+
+[data-theme="light"] {
+  --bg:       var(--gray-05);
+  --surface:  var(--gray-00);
+  --surface2: var(--gray-10);
+  --border:   var(--gray-15);
+  --text:     var(--gray-90);
+  --text2:    var(--gray-85);
+  --muted:    var(--gray-45);
+
+  --purple:   #6b3fdb;
+  --blue:     #1a6fcf;
+  --green:    #3d7a00;
+  --red:      #c00000;
+
+  --tint-purple: #ede8ff;
+  --tint-blue:   #e6f0ff;
+  --tint-red:    #fff0f0;
+  --tint-yellow: #fff8e0;
+  --tint-green:  #f0f8e0;
 }
 
 html { font-size: 18px; }
@@ -105,7 +133,7 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
 }
 
 .level-btn:hover { border-color: var(--purple); }
-.level-btn.active { border-color: var(--purple); background: #1f1b2e; }
+.level-btn.active { border-color: var(--purple); background: var(--tint-purple); }
 
 .level-btn .lv-num {
   font-size: 0.72rem;
@@ -145,7 +173,7 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
 }
 
 .timer-btn:hover { border-color: var(--blue); }
-.timer-btn.active { border-color: var(--blue); background: #0f1a28; }
+.timer-btn.active { border-color: var(--blue); background: var(--tint-blue); }
 
 .round-group {
   display: flex;
@@ -326,9 +354,9 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
 }
 
 .grade-btn:disabled { opacity: 0.3; cursor: default; }
-.grade-btn.hard:not(:disabled):hover { border-color: var(--red);    background: #1e0f0f; }
-.grade-btn.ok:not(:disabled):hover   { border-color: var(--yellow); background: #1e1800; }
-.grade-btn.easy:not(:disabled):hover { border-color: var(--green);  background: #141e0a; }
+.grade-btn.hard:not(:disabled):hover { border-color: var(--red);    background: var(--tint-red); }
+.grade-btn.ok:not(:disabled):hover   { border-color: var(--yellow); background: var(--tint-yellow); }
+.grade-btn.easy:not(:disabled):hover { border-color: var(--green);  background: var(--tint-green); }
 
 /* ── Results screen ── */
 #results {
@@ -646,8 +674,8 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
 
 .quiz-option:hover:not(:disabled) { border-color: var(--purple); }
 .quiz-option:disabled { cursor: default; }
-.quiz-option.correct { border-color: var(--green); background: #141e0a; color: var(--green); }
-.quiz-option.wrong   { border-color: var(--red);   background: #1e0f0f; color: var(--red); }
+.quiz-option.correct { border-color: var(--green); background: var(--tint-green); color: var(--green); }
+.quiz-option.wrong   { border-color: var(--red);   background: var(--tint-red);   color: var(--red); }
 
 .quiz-next-btn {
   width: 100%;
@@ -673,6 +701,24 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
   font-size: 0.95rem;
   line-height: 1.6;
 }
+
+/* ── Theme toggle ── */
+.theme-toggle {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  z-index: 100;
+}
+
+.theme-toggle:hover { border-color: var(--purple); }
 
 /* ── Mobile ── */
 @media (max-width: 480px) {
