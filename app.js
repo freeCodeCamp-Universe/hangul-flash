@@ -386,12 +386,12 @@ function shuffle(arr) {
 const SCREENS = ['setup','flash','results','theory','quiz','quizResults'];
 const SCREEN_DISPLAY = { setup: 'grid' };
 const SCREEN_TITLES = {
-  setup:       '한글 Flash — Practice',
-  flash:       '한글 Flash — Practice',
-  results:     '한글 Flash — Results',
-  theory:      '한글 Flash — Theory',
-  quiz:        '한글 Flash — Quiz',
-  quizResults: '한글 Flash — Quiz Results',
+  setup:       '한글 Flash',
+  flash:       '한글 Flash',
+  results:     '한글 Flash',
+  theory:      '한글 Flash',
+  quiz:        '한글 Flash',
+  quizResults: '한글 Flash',
 };
 
 let _firstShow = true;
@@ -404,7 +404,7 @@ function show(id) {
   document.title = SCREEN_TITLES[id] || '한글 Flash';
   if (!_firstShow) {
     const el = document.getElementById(id);
-    if (el) el.focus();
+    if (el) el.focus({ preventScroll: true });
   }
 }
 
@@ -815,7 +815,7 @@ document.querySelectorAll('#theory .alpha-cell').forEach(cell => {
   const rom = cell.querySelector('.rom');
   cell.setAttribute('role', 'button');
   cell.setAttribute('tabindex', '0');
-  cell.setAttribute('aria-label', `${char?.textContent.trim()}, ${rom?.textContent.trim()} — tap to hear`);
+  cell.setAttribute('aria-label', `${char?.textContent.trim()}, ${rom?.textContent.trim()}, tap to hear`);
   if (char) char.setAttribute('lang', 'ko');
 });
 
@@ -824,7 +824,7 @@ document.querySelectorAll('#theory .syl-box').forEach(box => {
   const breakdown = box.querySelector('.breakdown');
   box.setAttribute('role', 'button');
   box.setAttribute('tabindex', '0');
-  box.setAttribute('aria-label', `${big?.textContent.trim()}, ${breakdown?.textContent.trim()} — tap to hear`);
+  box.setAttribute('aria-label', `${big?.textContent.trim()}, ${breakdown?.textContent.trim()}, tap to hear`);
   if (big) big.setAttribute('lang', 'ko');
 });
 

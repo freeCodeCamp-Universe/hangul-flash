@@ -345,17 +345,22 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
 
 .speak-btn {
   position: absolute;
-  top: 12px;
-  right: 14px;
+  top: 8px;
+  right: 8px;
   background: none;
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
   opacity: 0.4;
-  padding: 4px 6px;
+  padding: 10px;
   border-radius: 6px;
   line-height: 1;
   transition: opacity 0.15s;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .speak-btn:hover { opacity: 1; }
@@ -511,7 +516,7 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
   color: var(--muted);
   font-size: 0.9rem;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 12px 8px;
   border-radius: 6px;
   transition: color 0.15s;
 }
@@ -788,11 +793,16 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
 
 .theme-toggle,
 .btn-sound {
+  width: 32px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 1.1rem;
+  padding: 0;
+  font-size: 0.85rem;
   line-height: 1;
   cursor: pointer;
   color: var(--text);
@@ -801,12 +811,6 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
 
 .theme-toggle:hover,
 .btn-sound:hover { border-color: var(--purple); }
-
-.btn-sound {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
 
 .btn-sound svg { width: 1.1em; height: 1.1em; fill: currentColor; display: block; }
 
@@ -830,11 +834,16 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
 
   body { padding: 16px 12px; }
 
-  header { margin-bottom: 20px; }
+  /* Push header down so fixed header-actions buttons don't overlap */
+  header { margin-top: 48px; margin-bottom: 20px; }
 
-  /* Nav: 3 tabs need tighter padding */
+  /* Shrink header-actions buttons slightly to fit side-by-side */
+  .header-actions { gap: 4px; }
+  .theme-toggle, .btn-sound { width: 40px; height: 40px; font-size: 0.95rem; }
+
+  /* Nav: full-height tabs for easy tapping */
   .nav-tabs { margin-bottom: 20px; }
-  .nav-tab { padding: 9px 8px; font-size: 0.88rem; }
+  .nav-tab { padding: 12px 8px; font-size: 0.88rem; }
 
   /* Cards */
   .card { padding: 16px; }
@@ -845,14 +854,23 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
   .alpha-grid.cols-4,
   .alpha-grid.cols-3 { grid-template-columns: repeat(2, 1fr); }
 
-  /* Syllable demo */
-  .syl-box { min-width: 80px; padding: 12px 10px; }
 
   /* Quiz: always single column on mobile for larger tap targets */
   .quiz-options.cols-2 { grid-template-columns: 1fr; }
 
-  /* Grade buttons: slightly smaller text so emoji + label fits */
-  .grade-btn { font-size: 0.9rem; padding: 13px 4px; }
+  /* Grade buttons: full tap-target height */
+  .grade-btn { font-size: 0.9rem; padding: 16px 4px; }
+}
+
+@media (max-width: 600px) {
+  /* Theory: more breathing room on small screens */
+  #theory { gap: 36px; }
+  .theory-section { padding: 0 4px; }
+  .theory-section h2 { margin-bottom: 16px; }
+  .alpha-grid { gap: 12px; }
+  .alpha-cell { padding: 18px 10px; }
+  .syl-box { padding: 20px 16px; }
+  .syllable-demo { gap: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
