@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>한글 — Learn to Read Korean</title>
+  <title>한글 Flash — Practice</title>
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -42,60 +42,69 @@
 </head>
 <body>
 
-<button id="themeToggle" class="theme-toggle" aria-label="Switch to light theme">☀️</button>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<div class="header-actions">
+  <button class="btn-sound" id="soundToggle" aria-label="Sound on" data-sfx="on">
+    <span class="sfx-on" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M48 352l48 0 134.1 119.2c6.4 5.7 14.6 8.8 23.1 8.8 19.2 0 34.8-15.6 34.8-34.8l0-378.4c0-19.2-15.6-34.8-34.8-34.8-8.5 0-16.7 3.1-23.1 8.8L96 160 48 160c-26.5 0-48 21.5-48 48l0 96c0 26.5 21.5 48 48 48zM441.1 107c-10.3-8.4-25.4-6.8-33.8 3.5s-6.8 25.4 3.5 33.8C443.3 170.7 464 210.9 464 256s-20.7 85.3-53.2 111.8c-10.3 8.4-11.8 23.5-3.5 33.8s23.5 11.8 33.8 3.5c43.2-35.2 70.9-88.9 70.9-149s-27.7-113.8-70.9-149zm-60.5 74.5c-10.3-8.4-25.4-6.8-33.8 3.5s-6.8 25.4 3.5 33.8C361.1 227.6 368 241 368 256s-6.9 28.4-17.7 37.3c-10.3 8.4-11.8 23.5-3.5 33.8s23.5 11.8 33.8 3.5C402.1 312.9 416 286.1 416 256s-13.9-56.9-35.5-74.5z"/></svg></span>
+    <span class="sfx-off" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M48 352l48 0 134.1 119.2c6.4 5.7 14.6 8.8 23.1 8.8 19.2 0 34.8-15.6 34.8-34.8l0-378.4c0-19.2-15.6-34.8-34.8-34.8-8.5 0-16.7 3.1-23.1 8.8L96 160 48 160c-26.5 0-48 21.5-48 48l0 96c0 26.5 21.5 48 48 48zM367 175c-9.4 9.4-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0z"/></svg></span>
+  </button>
+  <button id="themeToggle" class="theme-toggle" aria-label="Switch to light theme">☀️</button>
+</div>
 
 <header>
-  <h1><span>한글</span> Flash</h1>
+  <h1><span lang="ko">한글</span> Flash</h1>
   <p>Build your Korean reading speed</p>
 </header>
 
-<div class="nav-tabs">
-  <button class="nav-tab active" data-tab="practice">Practice</button>
-  <button class="nav-tab"        data-tab="quiz">Quiz</button>
-  <button class="nav-tab"        data-tab="theory">Theory</button>
-</div>
+<nav class="nav-tabs" aria-label="Sections">
+  <button class="nav-tab active" id="tab-practice" aria-current="true"  data-tab="practice">Practice</button>
+  <button class="nav-tab"        id="tab-quiz"     aria-current="false" data-tab="quiz">Quiz</button>
+  <button class="nav-tab"        id="tab-theory"   aria-current="false" data-tab="theory">Theory</button>
+</nav>
+
+<main id="main-content">
 
 <!-- Setup -->
-<div id="setup">
+<div id="setup" tabindex="-1">
   <div class="card">
-    <h2>Level</h2>
-    <div class="level-grid">
-      <button class="level-btn active" data-level="1">
+    <h2 id="level-label">Level</h2>
+    <div class="level-grid" role="group" aria-labelledby="level-label">
+      <button class="level-btn active" data-level="1" aria-pressed="true">
         <div class="lv-num">Level 1</div>
         <div class="lv-title">Letters</div>
-        <div class="lv-example">ㄱ ㅏ ㄴ</div>
+        <div class="lv-example" lang="ko">ㄱ ㅏ ㄴ</div>
       </button>
-      <button class="level-btn" data-level="2">
+      <button class="level-btn" data-level="2" aria-pressed="false">
         <div class="lv-num">Level 2</div>
         <div class="lv-title">Syllables</div>
-        <div class="lv-example">한 가 나</div>
+        <div class="lv-example" lang="ko">한 가 나</div>
       </button>
-      <button class="level-btn" data-level="3">
+      <button class="level-btn" data-level="3" aria-pressed="false">
         <div class="lv-num">Level 3</div>
         <div class="lv-title">Words</div>
-        <div class="lv-example">하늘 물 나무</div>
+        <div class="lv-example" lang="ko">하늘 물 나무</div>
       </button>
-      <button class="level-btn" data-level="4">
+      <button class="level-btn" data-level="4" aria-pressed="false">
         <div class="lv-num">Level 4</div>
         <div class="lv-title">Sentences</div>
-        <div class="lv-example">나는 학생이에요</div>
+        <div class="lv-example" lang="ko">나는 학생이에요</div>
       </button>
     </div>
   </div>
 
   <div class="card" id="timerCard">
-    <h2>Timer</h2>
-    <div class="timer-group">
-      <button class="timer-btn active" data-timer="0">No timer</button>
-      <button class="timer-btn" data-timer="5">5 sec</button>
-      <button class="timer-btn" data-timer="10">10 sec</button>
+    <h2 id="timer-label">Timer</h2>
+    <div class="timer-group" role="group" aria-labelledby="timer-label">
+      <button class="timer-btn active" data-timer="0" aria-pressed="true">No timer</button>
+      <button class="timer-btn" data-timer="5" aria-pressed="false">5 sec</button>
+      <button class="timer-btn" data-timer="10" aria-pressed="false">10 sec</button>
     </div>
   </div>
 
   <div class="card">
     <h2>Cards per round</h2>
     <div class="round-group">
-      <label>Cards</label>
+      <label for="roundSlider">Cards</label>
       <input type="range" id="roundSlider" min="5" max="30" step="5" value="10" />
       <span id="roundVal">10</span>
     </div>
@@ -105,34 +114,31 @@
 </div>
 
 <!-- Flash -->
-<div id="flash">
+<div id="flash" tabindex="-1">
   <div class="progress-row">
     <span id="cardCounter">1 / 10</span>
     <span id="levelLabel">Level 1 · Letters</span>
-  </div>
-  <div class="progress-bar-wrap">
-    <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
   </div>
   <div class="timer-bar-wrap" id="timerBarWrap" style="display:none">
     <div class="timer-bar-fill" id="timerBar" style="width:100%"></div>
   </div>
   <div class="flash-card" id="flashCard">
     <button class="speak-btn" id="speakBtn" aria-label="Play pronunciation">🔊</button>
-    <div class="korean" id="koreanText">-</div>
+    <div class="korean" id="koreanText" lang="ko">-</div>
     <div class="romanization" id="romanText"></div>
     <div class="meaning" id="meaningText"></div>
     <div class="tap-hint">tap to reveal</div>
   </div>
   <div class="action-row">
-    <button class="grade-btn hard" id="btnHard" disabled>😓 Hard</button>
-    <button class="grade-btn ok"   id="btnOk"   disabled>😐 OK</button>
-    <button class="grade-btn easy" id="btnEasy"  disabled>😊 Easy</button>
+    <button class="grade-btn hard" id="btnHard" aria-disabled="true">😓 Hard</button>
+    <button class="grade-btn ok"   id="btnOk"   aria-disabled="true">😐 OK</button>
+    <button class="grade-btn easy" id="btnEasy"  aria-disabled="true">😊 Easy</button>
   </div>
   <button class="leave-btn" id="btnLeave">← Leave round</button>
 </div>
 
 <!-- Results -->
-<div id="results">
+<div id="results" tabindex="-1">
   <div class="results-header">
     <div class="score" id="scoreText">80%</div>
     <p id="scoreSubtext">Nice work!</p>
@@ -146,28 +152,22 @@
     <h2>Review these</h2>
     <div class="missed-items" id="missedItems"></div>
   </div>
-  <div class="results-actions">
-    <button class="btn-retry" id="btnRetry">↩ Retry level</button>
-    <button class="btn-next"  id="btnNext">Next level →</button>
-  </div>
-  <button class="leave-btn" id="btnHome">← Back to start</button>
+  <button class="btn-next" id="btnRetry">Next round</button>
+  <button class="leave-btn" id="btnHome">Back to menu</button>
 </div>
 
 <!-- Quiz -->
-<div id="quiz">
+<div id="quiz" tabindex="-1">
   <div class="progress-row">
     <span id="quizCounter">1 / 10</span>
     <span id="quizLevelLabel">Level 1 · Letters</span>
-  </div>
-  <div class="progress-bar-wrap">
-    <div class="progress-bar-fill" id="quizProgressBar" style="width:0%"></div>
   </div>
   <div class="timer-bar-wrap" id="quizTimerBarWrap" style="display:none">
     <div class="timer-bar-fill" id="quizTimerBar" style="width:100%"></div>
   </div>
   <div class="quiz-card">
     <button class="speak-btn" id="quizSpeakBtn" aria-label="Play pronunciation">🔊</button>
-    <div class="korean" id="quizKoreanText">-</div>
+    <div class="korean" id="quizKoreanText" lang="ko">-</div>
   </div>
   <div class="quiz-options" id="quizOptions"></div>
   <button class="quiz-next-btn" id="quizNextBtn" style="display:none">Next →</button>
@@ -175,7 +175,7 @@
 </div>
 
 <!-- Quiz results -->
-<div id="quizResults">
+<div id="quizResults" tabindex="-1">
   <div class="results-header">
     <div class="score" id="quizScoreText">8 / 10</div>
     <p id="quizScoreSubtext">Great work!</p>
@@ -184,14 +184,12 @@
     <h2>Review these</h2>
     <div class="missed-items" id="quizMissedItems"></div>
   </div>
-  <div class="results-actions">
-    <button class="btn-retry" id="quizBtnHome">← Menu</button>
-    <button class="btn-next"  id="quizBtnRetry">↩ Retry</button>
-  </div>
+  <button class="btn-next" id="quizBtnRetry">Next round</button>
+  <button class="leave-btn" id="quizBtnHome">Back to menu</button>
 </div>
 
 <!-- Theory -->
-<div id="theory">
+<div id="theory" tabindex="-1">
 
   <div class="theory-section">
     <h2>How Hangul works</h2>
@@ -339,6 +337,10 @@
   </div>
 
 </div>
+
+<div id="a11y-announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+</main>
 
 <script src="app.js"></script>
 </body>

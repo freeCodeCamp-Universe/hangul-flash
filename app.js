@@ -26,6 +26,26 @@
   });
 })();
 
+// ── Sound toggle ──────────────────────────────────────────────────────────────
+
+let sfxEnabled = true;
+
+function setSfx(val) {
+  sfxEnabled = val;
+  localStorage.setItem('hangul-sfx', val ? '1' : '0');
+  const btn = document.getElementById('soundToggle');
+  if (!btn) return;
+  btn.setAttribute('data-sfx', val ? 'on' : 'off');
+  btn.setAttribute('aria-label', val ? 'Sound on' : 'Sound off');
+}
+
+document.getElementById('soundToggle').addEventListener('click', () => setSfx(!sfxEnabled));
+
+(function () {
+  const saved = localStorage.getItem('hangul-sfx');
+  if (saved !== null) setSfx(saved === '1');
+})();
+
 // ── Text-to-speech ────────────────────────────────────────────────────────────
 
 const SPEAK_OVERRIDE = {
@@ -68,6 +88,7 @@ function getAudioCtx() {
 }
 
 function playCorrect() {
+  if (!sfxEnabled) return;
   const ctx = getAudioCtx();
   [[523, 0, 0.15], [784, 0.12, 0.45]].forEach(([freq, start, end]) => {
     const osc = ctx.createOscillator();
@@ -84,6 +105,7 @@ function playCorrect() {
 }
 
 function playWrong() {
+  if (!sfxEnabled) return;
   const ctx = getAudioCtx();
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
@@ -105,7 +127,10 @@ let activeTab = 'practice';
 document.querySelectorAll('.nav-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     activeTab = tab.dataset.tab;
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t === tab));
+    document.querySelectorAll('.nav-tab').forEach(t => {
+      t.classList.toggle('active', t === tab);
+      t.setAttribute('aria-current', t === tab ? 'true' : 'false');
+    });
     clearTimer();
     if (activeTab === 'theory') {
       show('theory');
@@ -359,22 +384,47 @@ function shuffle(arr) {
 }
 
 const SCREENS = ['setup','flash','results','theory','quiz','quizResults'];
-
 const SCREEN_DISPLAY = { setup: 'grid' };
+const SCREEN_TITLES = {
+  setup:       '한글 Flash — Practice',
+  flash:       '한글 Flash — Practice',
+  results:     '한글 Flash — Results',
+  theory:      '한글 Flash — Theory',
+  quiz:        '한글 Flash — Quiz',
+  quizResults: '한글 Flash — Quiz Results',
+};
+
+let _firstShow = true;
 
 function show(id) {
   SCREENS.forEach(s => {
     const el = document.getElementById(s);
     if (el) el.style.display = s === id ? (SCREEN_DISPLAY[s] || 'flex') : 'none';
   });
+  document.title = SCREEN_TITLES[id] || '한글 Flash';
+  if (!_firstShow) {
+    const el = document.getElementById(id);
+    if (el) el.focus();
+  }
+}
+
+function announce(msg) {
+  const el = document.getElementById('a11y-announce');
+  if (!el) return;
+  el.textContent = '';
+  requestAnimationFrame(() => { el.textContent = msg; });
 }
 
 // ── Setup interactions ────────────────────────────────────────────────────────
 
 document.querySelectorAll('.level-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.level-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
     btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
     config.level = +btn.dataset.level;
     saveConfig();
   });
@@ -382,8 +432,12 @@ document.querySelectorAll('.level-btn').forEach(btn => {
 
 document.querySelectorAll('.timer-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.timer-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
     btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
     config.timer = +btn.dataset.timer;
     saveConfig();
   });
@@ -398,8 +452,16 @@ slider.addEventListener('input', () => {
 });
 
 // Apply loaded config to UI
-document.querySelectorAll('.level-btn').forEach(b => b.classList.toggle('active', +b.dataset.level === config.level));
-document.querySelectorAll('.timer-btn').forEach(b => b.classList.toggle('active', +b.dataset.timer === config.timer));
+document.querySelectorAll('.level-btn').forEach(b => {
+  const on = +b.dataset.level === config.level;
+  b.classList.toggle('active', on);
+  b.setAttribute('aria-pressed', on ? 'true' : 'false');
+});
+document.querySelectorAll('.timer-btn').forEach(b => {
+  const on = +b.dataset.timer === config.timer;
+  b.classList.toggle('active', on);
+  b.setAttribute('aria-pressed', on ? 'true' : 'false');
+});
 slider.value = config.rounds;
 roundVal.textContent = config.rounds;
 
@@ -418,6 +480,7 @@ function startSession() {
   show('flash');
   document.getElementById('levelLabel').textContent =
     `Level ${config.level} · ${LEVEL_NAMES[config.level]}`;
+  announce(`Practice started. Level ${config.level}, ${LEVEL_NAMES[config.level]}. Card 1 of ${session.queue.length}.`);
   showCard();
 }
 
@@ -428,7 +491,6 @@ function showCard() {
   const current = session.idx + 1;
 
   document.getElementById('cardCounter').textContent = `${current} / ${total}`;
-  document.getElementById('progressBar').style.width = `${((current - 1) / total) * 100}%`;
 
   const flashCard = document.getElementById('flashCard');
   flashCard.classList.remove('revealed');
@@ -454,12 +516,14 @@ function revealCard() {
   document.getElementById('flashCard').classList.add('revealed');
   clearTimer();
   setGradeButtons(true);
+  const card = session.queue[session.idx];
+  announce(`${card.r}${card.m ? ', ' + card.m : ''}. Rate your confidence.`);
 }
 
 function setGradeButtons(enabled) {
-  document.getElementById('btnHard').disabled = !enabled;
-  document.getElementById('btnOk').disabled   = !enabled;
-  document.getElementById('btnEasy').disabled  = !enabled;
+  ['btnHard', 'btnOk', 'btnEasy'].forEach(id => {
+    document.getElementById(id).setAttribute('aria-disabled', enabled ? 'false' : 'true');
+  });
 }
 
 document.getElementById('flashCard').addEventListener('click', () => {
@@ -475,7 +539,8 @@ document.getElementById('speakBtn').addEventListener('click', e => {
 
 ['btnHard','btnOk','btnEasy'].forEach((id, i) => {
   const grades = ['hard','ok','easy'];
-  document.getElementById(id).addEventListener('click', () => {
+  document.getElementById(id).addEventListener('click', function() {
+    if (this.getAttribute('aria-disabled') === 'true') return;
     session.grades.push({ card: session.queue[session.idx], grade: grades[i] });
     session.idx++;
     if (session.idx < session.queue.length) {
@@ -492,6 +557,7 @@ function startTimer() {
   const bar = document.getElementById('timerBar');
   const total = config.timer * 1000;
   let start = null;
+  let dangerAnnounced = false;
 
   function tick(ts) {
     if (!start) start = ts;
@@ -499,6 +565,7 @@ function startTimer() {
     const pct = Math.max(0, 1 - elapsed / total);
     bar.style.width = `${pct * 100}%`;
     bar.style.background = pct > 0.4 ? '#acd157' : pct > 0.15 ? '#ffc300' : '#ffadad';
+    if (pct <= 0.15 && !dangerAnnounced) { dangerAnnounced = true; announce('Almost out of time'); }
 
     if (pct > 0) {
       session.timerHandle = requestAnimationFrame(tick);
@@ -557,23 +624,11 @@ function showResults() {
     missedItems.appendChild(el);
   });
 
-  const nextBtn = document.getElementById('btnNext');
-  nextBtn.textContent = config.level < 4 ? 'Next level →' : 'Restart →';
-
+  announce(`Round complete. Score ${pct}%. ${counts.easy} easy, ${counts.ok} OK, ${counts.hard} hard.`);
   show('results');
 }
 
 document.getElementById('btnRetry').addEventListener('click', () => {
-  startSession();
-});
-
-document.getElementById('btnNext').addEventListener('click', () => {
-  if (config.level < 4) {
-    config.level++;
-    document.querySelectorAll('.level-btn').forEach(b => {
-      b.classList.toggle('active', +b.dataset.level === config.level);
-    });
-  }
   startSession();
 });
 
@@ -604,6 +659,7 @@ function startQuiz() {
   show('quiz');
   document.getElementById('quizLevelLabel').textContent =
     `Level ${config.level} · ${LEVEL_NAMES[config.level]}`;
+  announce(`Quiz started. Level ${config.level}, ${LEVEL_NAMES[config.level]}. Question 1 of ${quizSession.queue.length}.`);
   showQuizQuestion();
 }
 
@@ -611,12 +667,14 @@ function startQuizTimer(correctK) {
   const bar = document.getElementById('quizTimerBar');
   const total = config.timer * 1000;
   let start = null;
+  let dangerAnnounced = false;
 
   function tick(ts) {
     if (!start) start = ts;
     const pct = Math.max(0, 1 - (ts - start) / total);
     bar.style.width = `${pct * 100}%`;
     bar.style.background = pct > 0.4 ? '#acd157' : pct > 0.15 ? '#ffc300' : '#ffadad';
+    if (pct <= 0.15 && !dangerAnnounced) { dangerAnnounced = true; announce('Almost out of time'); }
     if (pct > 0) {
       quizSession.timerHandle = requestAnimationFrame(tick);
     } else {
@@ -643,9 +701,9 @@ function showQuizQuestion() {
   const current = quizSession.idx + 1;
 
   document.getElementById('quizCounter').textContent = `${current} / ${total}`;
-  document.getElementById('quizProgressBar').style.width = `${((current - 1) / total) * 100}%`;
   document.getElementById('quizKoreanText').textContent = card.k;
   document.getElementById('quizNextBtn').style.display = 'none';
+  announce(`Question ${current} of ${total}.`);
 
   const pool = DATA[config.level];
   const distractors = shuffle(pool.filter(c => c.k !== card.k)).slice(0, 3);
@@ -674,12 +732,20 @@ function showQuizQuestion() {
 
 function handleOptionClick(selectedBtn, isCorrect, correctK) {
   clearQuizTimer();
+  let correctLabel = '';
   document.getElementById('quizOptions').querySelectorAll('.quiz-option').forEach(btn => {
     btn.disabled = true;
-    if (btn.dataset.k === correctK) btn.classList.add('correct');
+    if (btn.dataset.k === correctK) { btn.classList.add('correct'); correctLabel = btn.textContent.trim(); }
   });
   if (selectedBtn && !isCorrect) selectedBtn.classList.add('wrong');
   isCorrect ? playCorrect() : playWrong();
+  if (isCorrect) {
+    announce('Correct!');
+  } else if (selectedBtn) {
+    announce(`Wrong. Correct answer: ${correctLabel}`);
+  } else {
+    announce(`Time's up. Correct answer: ${correctLabel}`);
+  }
   quizSession.results.push({ card: quizSession.queue[quizSession.idx], correct: isCorrect });
   document.getElementById('quizNextBtn').style.display = 'block';
 }
@@ -707,6 +773,7 @@ function showQuizResults() {
     missedItems.appendChild(el);
   });
 
+  announce(`Quiz complete. ${correct} of ${total} correct.`);
   show('quizResults');
 }
 
@@ -741,5 +808,46 @@ document.getElementById('theory').addEventListener('click', e => {
 document.getElementById('quizBtnHome').addEventListener('click', () => show('setup'));
 document.getElementById('quizBtnRetry').addEventListener('click', () => startQuiz());
 
+// ── Theory keyboard accessibility ─────────────────────────────────────────────
+
+document.querySelectorAll('#theory .alpha-cell').forEach(cell => {
+  const char = cell.querySelector('.char');
+  const rom = cell.querySelector('.rom');
+  cell.setAttribute('role', 'button');
+  cell.setAttribute('tabindex', '0');
+  cell.setAttribute('aria-label', `${char?.textContent.trim()}, ${rom?.textContent.trim()} — tap to hear`);
+  if (char) char.setAttribute('lang', 'ko');
+});
+
+document.querySelectorAll('#theory .syl-box').forEach(box => {
+  const big = box.querySelector('.big');
+  const breakdown = box.querySelector('.breakdown');
+  box.setAttribute('role', 'button');
+  box.setAttribute('tabindex', '0');
+  box.setAttribute('aria-label', `${big?.textContent.trim()}, ${breakdown?.textContent.trim()} — tap to hear`);
+  if (big) big.setAttribute('lang', 'ko');
+});
+
+document.querySelectorAll('#theory .alpha-table td.char').forEach(td => {
+  td.setAttribute('role', 'button');
+  td.setAttribute('tabindex', '0');
+  td.setAttribute('aria-label', `Speak ${td.textContent.trim()}`);
+  td.setAttribute('lang', 'ko');
+});
+
+document.getElementById('theory').addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const cell = e.target.closest('.alpha-cell, .syl-box');
+  if (cell) {
+    e.preventDefault();
+    const charEl = cell.querySelector('.char, .big');
+    if (charEl) speak(charEl.textContent.trim());
+    return;
+  }
+  const td = e.target.closest('.alpha-table td.char');
+  if (td) { e.preventDefault(); speak(td.textContent.trim()); }
+});
+
 // init
 show('setup');
+_firstShow = false;
