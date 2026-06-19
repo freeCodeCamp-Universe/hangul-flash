@@ -70,10 +70,10 @@
 
 [data-theme="light"] {
   --bg:       var(--gray-05);
-  --surface:  var(--gray-00);
-  --surface2: var(--gray-10);
-  --border:   #7a7a86;
-  --track:    var(--gray-15);
+  --surface:  #ffffff;
+  --surface2: #eae7fb;
+  --border:   #b8b4d4;
+  --track:    #d4d0ef;
   --text:     var(--gray-90);
   --text2:    var(--gray-85);
   --muted:    #696970;
@@ -115,24 +115,37 @@ main#main-content {
 
 header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 20px;
 }
 
 header h1 {
-  font-size: 2rem;
+  font-size: 2.4rem;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  letter-spacing: -1px;
 }
 
 header h1 span { color: var(--purple); }
-header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
+
+header p {
+  margin-top: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.hs-l1 { color: var(--purple); }
+.hs-l2 { color: var(--blue); }
+.hs-l3 { color: var(--green); }
+.hs-l4 { color: var(--yellow); }
+.hs-arrow { color: var(--muted); margin: 0 6px; font-size: 0.8rem; font-weight: 400; }
 
 /* ── Setup screen ── */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px 24px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .card h2 {
@@ -153,38 +166,48 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
   background: var(--surface2);
   border: 2px solid var(--border);
   border-radius: 12px;
-  padding: 14px 12px;
+  padding: 14px 10px;
   cursor: pointer;
   color: var(--text);
-  text-align: left;
+  text-align: center;
   transition: border-color 0.15s, background 0.15s;
 }
 
 .level-btn:hover { border-color: var(--purple); }
-.level-btn.active { border-color: var(--purple); background: var(--tint-purple); }
+.level-btn.active {
+  border-color: var(--purple);
+  background: var(--tint-purple);
+}
+.level-btn.active .lv-example { color: var(--purple); }
 
-.level-btn .lv-num {
-  font-size: 0.72rem;
-  color: var(--purple);
+.level-btn .lv-example {
+  font-size: 1.6rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  color: var(--text2);
+  display: block;
+  margin-bottom: 6px;
+  transition: color 0.15s;
 }
 
 .level-btn .lv-title {
-  font-size: 1rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  margin: 4px 0 2px;
 }
 
-.level-btn .lv-example {
-  font-size: 1.1rem;
-  color: var(--text2);
+.level-btn .lv-num {
+  font-size: 0.65rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
 }
 
 .timer-group {
+  flex: 1;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 10px;
 }
 
@@ -201,10 +224,11 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
   transition: border-color 0.15s, background 0.15s;
 }
 
-.timer-btn:hover { border-color: var(--blue); }
-.timer-btn.active { border-color: var(--blue); background: var(--tint-blue); }
+.timer-btn:hover { border-color: var(--purple); }
+.timer-btn.active { border-color: var(--purple); background: var(--tint-purple); }
 
 .round-group {
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -830,7 +854,8 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
 }
 
 .theme-toggle,
-.btn-sound {
+.btn-sound,
+.btn-shortcuts {
   width: 32px;
   height: 28px;
   display: inline-flex;
@@ -848,7 +873,104 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
 }
 
 .theme-toggle:hover,
-.btn-sound:hover { border-color: var(--purple); }
+.btn-sound:hover,
+.btn-shortcuts:hover { border-color: var(--purple); }
+
+.btn-shortcuts svg { width: 1.1em; height: 1.1em; fill: currentColor; display: block; }
+
+/* ── Keyboard shortcuts modal ── */
+.shortcuts-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(10, 10, 35, 0.75);
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 72px;
+}
+
+.shortcuts-modal.open { display: flex; }
+
+.shortcuts-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px 28px;
+  width: min(380px, 88vw);
+}
+
+.sc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.sc-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.sc-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: color 0.15s;
+}
+
+.sc-close:hover { color: var(--text); }
+
+.sc-group + .sc-group {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.sc-section {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--purple);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+}
+
+.sc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sc-list > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sc-list dt { font-size: 0.9rem; white-space: nowrap; }
+.sc-list dd { font-size: 0.9rem; color: var(--text2); margin: 0; }
+
+kbd {
+  display: inline-block;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 1px 6px;
+  font-size: 0.82rem;
+  font-family: 'Fira Mono', 'Menlo', 'Consolas', monospace;
+  color: var(--text);
+  line-height: 1.5;
+}
 
 .btn-sound svg { width: 1.1em; height: 1.1em; fill: currentColor; display: block; }
 
@@ -873,11 +995,13 @@ header p { color: var(--muted); margin-top: 6px; font-size: 1rem; }
   body { padding: 16px 12px; }
 
   /* Push header down so fixed header-actions buttons don't overlap */
-  header { margin-top: 48px; margin-bottom: 20px; }
+  header { margin-top: 48px; margin-bottom: 14px; }
+  header h1 { font-size: 1.9rem; }
 
   /* Shrink header-actions buttons slightly to fit side-by-side */
   .header-actions { gap: 4px; }
   .theme-toggle, .btn-sound { width: 40px; height: 40px; font-size: 0.95rem; }
+  .btn-shortcuts { display: none; }
 
   /* Nav: full-height tabs for easy tapping */
   .nav-tabs { margin-bottom: 20px; }

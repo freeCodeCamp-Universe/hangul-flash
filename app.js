@@ -919,6 +919,87 @@ document.getElementById('theory').addEventListener('keydown', e => {
   if (td) { e.preventDefault(); speak(td.textContent.trim()); }
 });
 
+// ── Keyboard shortcuts modal ──────────────────────────────────────────────────
+
+function openShortcuts() {
+  const modal = document.getElementById('shortcutsModal');
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.getElementById('shortcutsToggle').setAttribute('aria-expanded', 'true');
+}
+
+function closeShortcuts() {
+  const modal = document.getElementById('shortcutsModal');
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  document.getElementById('shortcutsToggle').setAttribute('aria-expanded', 'false');
+}
+
+document.getElementById('shortcutsToggle').addEventListener('click', () => {
+  document.getElementById('shortcutsModal').classList.contains('open')
+    ? closeShortcuts() : openShortcuts();
+});
+
+document.getElementById('shortcutsModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeShortcuts();
+});
+
+document.querySelector('.sc-close').addEventListener('click', closeShortcuts);
+
+// ── Keyboard shortcuts handler ────────────────────────────────────────────────
+
+function currentScreen() {
+  for (const s of SCREENS) {
+    const el = document.getElementById(s);
+    if (el && el.style.display !== 'none') return s;
+  }
+  return 'setup';
+}
+
+document.addEventListener('keydown', e => {
+  if (window.matchMedia('(max-width: 480px)').matches) return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+
+  const modal = document.getElementById('shortcutsModal');
+  if (modal.classList.contains('open')) {
+    if (e.key === 'Escape') { e.preventDefault(); closeShortcuts(); }
+    return;
+  }
+
+  const screen = currentScreen();
+  const onButton = e.target.tagName === 'BUTTON';
+
+  if (screen === 'flash') {
+    const revealed = document.getElementById('flashCard').classList.contains('revealed');
+
+    if (!revealed && !onButton && (e.key === ' ' || e.key === 'Enter')) {
+      e.preventDefault(); revealCard(); return;
+    }
+    if (e.key === '1') { e.preventDefault(); document.getElementById('btnHard').click(); }
+    else if (e.key === '2') { e.preventDefault(); document.getElementById('btnOk').click(); }
+    else if (e.key === '3') { e.preventDefault(); document.getElementById('btnEasy').click(); }
+    if (e.key === 'Escape') { e.preventDefault(); clearTimer(); show('setup'); }
+  }
+
+  if (screen === 'quiz') {
+    const nextBtn = document.getElementById('quizNextBtn');
+    const nextVisible = nextBtn.style.display !== 'none';
+
+    if (nextVisible && !onButton && (e.key === ' ' || e.key === 'Enter')) {
+      e.preventDefault(); nextBtn.click(); return;
+    }
+    if (!nextVisible) {
+      const idx = ['1','2','3','4'].indexOf(e.key);
+      if (idx !== -1) {
+        e.preventDefault();
+        const opts = [...document.querySelectorAll('#quizOptions .quiz-option')].filter(b => !b.disabled);
+        if (opts[idx]) opts[idx].click();
+      }
+    }
+    if (e.key === 'Escape') { e.preventDefault(); clearQuizTimer(); show('setup'); }
+  }
+});
+
 // init
 show('setup');
 _firstShow = false;

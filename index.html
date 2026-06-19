@@ -15,7 +15,7 @@
       grid-template-areas: "level timer" "level cards" "start start" "toggle toggle";
       width: 100%;
       max-width: 860px;
-      gap: 20px;
+      gap: 14px;
     }
     #setup > .card:first-child  { grid-area: level; }
     #setup > .card:nth-child(2) { grid-area: timer; }
@@ -23,8 +23,8 @@
     #setup > .start-btn {
       grid-area: start;
       justify-self: center;
-      width: 50%;
-      min-width: 260px;
+      width: 40%;
+      min-width: 220px;
     }
     #setup > .toggle-label {
       grid-area: toggle;
@@ -48,6 +48,9 @@
 
 <a href="#main-content" class="skip-link">Skip to main content</a>
 <div class="header-actions">
+  <button id="shortcutsToggle" class="btn-shortcuts" aria-label="Keyboard shortcuts" aria-expanded="false">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M64 64C28.7 64 0 92.7 0 128L0 384c0 35.3 28.7 64 64 64l448 0c35.3 0 64-28.7 64-64l0-256c0-35.3-28.7-64-64-64L64 64zm16 64l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zM64 240c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zM176 128l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zM160 240c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zm16 80l224 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-224 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80-176c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zm16 80l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80-80c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zm16 80l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80-80c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zm16 80l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16z"/></svg>
+  </button>
   <button class="btn-sound" id="soundToggle" aria-label="Sound on" data-sfx="on">
     <span class="sfx-on" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M48 352l48 0 134.1 119.2c6.4 5.7 14.6 8.8 23.1 8.8 19.2 0 34.8-15.6 34.8-34.8l0-378.4c0-19.2-15.6-34.8-34.8-34.8-8.5 0-16.7 3.1-23.1 8.8L96 160 48 160c-26.5 0-48 21.5-48 48l0 96c0 26.5 21.5 48 48 48zM441.1 107c-10.3-8.4-25.4-6.8-33.8 3.5s-6.8 25.4 3.5 33.8C443.3 170.7 464 210.9 464 256s-20.7 85.3-53.2 111.8c-10.3 8.4-11.8 23.5-3.5 33.8s23.5 11.8 33.8 3.5c43.2-35.2 70.9-88.9 70.9-149s-27.7-113.8-70.9-149zm-60.5 74.5c-10.3-8.4-25.4-6.8-33.8 3.5s-6.8 25.4 3.5 33.8C361.1 227.6 368 241 368 256s-6.9 28.4-17.7 37.3c-10.3 8.4-11.8 23.5-3.5 33.8s23.5 11.8 33.8 3.5C402.1 312.9 416 286.1 416 256s-13.9-56.9-35.5-74.5z"/></svg></span>
     <span class="sfx-off" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M48 352l48 0 134.1 119.2c6.4 5.7 14.6 8.8 23.1 8.8 19.2 0 34.8-15.6 34.8-34.8l0-378.4c0-19.2-15.6-34.8-34.8-34.8-8.5 0-16.7 3.1-23.1 8.8L96 160 48 160c-26.5 0-48 21.5-48 48l0 96c0 26.5 21.5 48 48 48zM367 175c-9.4 9.4-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0z"/></svg></span>
@@ -57,7 +60,9 @@
 
 <header>
   <h1><span lang="ko">한글</span> Flash</h1>
-  <p>Build your Korean reading speed</p>
+  <p aria-label="From letters to sentences">
+    <span class="hs-l1" lang="ko">ㄱ</span><span class="hs-arrow">→</span><span class="hs-l2" lang="ko">가</span><span class="hs-arrow">→</span><span class="hs-l3" lang="ko">하늘</span><span class="hs-arrow">→</span><span class="hs-l4" lang="ko">안녕하세요</span>
+  </p>
 </header>
 
 <nav class="nav-tabs" aria-label="Sections">
@@ -74,24 +79,24 @@
     <h2 id="level-label">Level</h2>
     <div class="level-grid" role="group" aria-labelledby="level-label">
       <button class="level-btn active" data-level="1" aria-pressed="true">
-        <div class="lv-num">Level 1</div>
-        <div class="lv-title">Letters</div>
         <div class="lv-example" lang="ko">ㄱ ㅏ ㄴ</div>
+        <div class="lv-title">Letters</div>
+        <div class="lv-num">Level 1</div>
       </button>
       <button class="level-btn" data-level="2" aria-pressed="false">
-        <div class="lv-num">Level 2</div>
-        <div class="lv-title">Syllables</div>
         <div class="lv-example" lang="ko">한 가 나</div>
+        <div class="lv-title">Syllables</div>
+        <div class="lv-num">Level 2</div>
       </button>
       <button class="level-btn" data-level="3" aria-pressed="false">
-        <div class="lv-num">Level 3</div>
+        <div class="lv-example" lang="ko">하늘 물</div>
         <div class="lv-title">Words</div>
-        <div class="lv-example" lang="ko">하늘 물 나무</div>
+        <div class="lv-num">Level 3</div>
       </button>
       <button class="level-btn" data-level="4" aria-pressed="false">
-        <div class="lv-num">Level 4</div>
+        <div class="lv-example" lang="ko">안녕하세요</div>
         <div class="lv-title">Sentences</div>
-        <div class="lv-example" lang="ko">나는 학생이에요</div>
+        <div class="lv-num">Level 4</div>
       </button>
     </div>
   </div>
@@ -117,7 +122,7 @@
   <button class="start-btn" id="startBtn">Start Round →</button>
   <label class="toggle-label" id="showTranslationToggle">
     <input type="checkbox" id="showTranslationCheck" />
-    Show translation in answers
+    Show translation
   </label>
 </div>
 
@@ -350,6 +355,31 @@
 <div id="a11y-announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
 </main>
+
+<div id="shortcutsModal" class="shortcuts-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="shortcutsTitle">
+  <div class="shortcuts-panel">
+    <div class="sc-header">
+      <p id="shortcutsTitle" class="sc-title">Keyboard shortcuts</p>
+      <button class="sc-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="sc-group">
+      <p class="sc-section">Practice</p>
+      <dl class="sc-list">
+        <div><dt><kbd>Space</kbd> or <kbd>Enter</kbd></dt><dd>Flip card</dd></div>
+        <div><dt><kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd></dt><dd>Hard / OK / Easy</dd></div>
+        <div><dt><kbd>Esc</kbd></dt><dd>Leave round</dd></div>
+      </dl>
+    </div>
+    <div class="sc-group">
+      <p class="sc-section">Quiz</p>
+      <dl class="sc-list">
+        <div><dt><kbd>1</kbd> – <kbd>4</kbd></dt><dd>Choose answer</dd></div>
+        <div><dt><kbd>Space</kbd> or <kbd>Enter</kbd></dt><dd>Next question</dd></div>
+        <div><dt><kbd>Esc</kbd></dt><dd>Leave quiz</dd></div>
+      </dl>
+    </div>
+  </div>
+</div>
 
 <script src="app.js"></script>
 </body>
