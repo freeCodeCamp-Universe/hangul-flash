@@ -12,7 +12,7 @@
   <style>
     #setup {
       grid-template-columns: 1fr 1fr;
-      grid-template-areas: "level timer" "level cards" "start start";
+      grid-template-areas: "level timer" "level cards" "start start" "toggle toggle";
       width: 100%;
       max-width: 860px;
       gap: 20px;
@@ -26,13 +26,17 @@
       width: 50%;
       min-width: 260px;
     }
+    #setup > .toggle-label {
+      grid-area: toggle;
+      justify-self: center;
+    }
     @media (min-width: 600px) {
       .nav-tabs { width: 100%; max-width: 860px; }
     }
     @media (max-width: 480px) {
       #setup {
         grid-template-columns: 1fr;
-        grid-template-areas: "level" "timer" "cards" "start";
+        grid-template-areas: "level" "timer" "cards" "start" "toggle";
         max-width: 520px;
       }
       #setup > .start-btn { width: 100%; justify-self: auto; }
@@ -111,6 +115,10 @@
   </div>
 
   <button class="start-btn" id="startBtn">Start Round →</button>
+  <label class="toggle-label" id="showTranslationToggle">
+    <input type="checkbox" id="showTranslationCheck" />
+    Show translation in answers
+  </label>
 </div>
 
 <!-- Flash -->

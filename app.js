@@ -355,7 +355,7 @@ const LEVEL_NAMES = { 1:'Letters', 2:'Syllables', 3:'Words', 4:'Sentences' };
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
-let config = { level: 1, timer: 0, rounds: 10 };
+let config = { level: 1, timer: 0, rounds: 10, showTranslation: false };
 let session = { queue: [], idx: 0, grades: [], timerHandle: null, timerRemaining: 0 };
 
 function saveConfig() {
@@ -369,6 +369,7 @@ function saveConfig() {
     if (saved.level) config.level = saved.level;
     if (saved.timer !== undefined) config.timer = saved.timer;
     if (saved.rounds) config.rounds = saved.rounds;
+    if (saved.showTranslation !== undefined) config.showTranslation = saved.showTranslation;
   } catch (e) {}
 })();
 
@@ -498,6 +499,13 @@ document.querySelectorAll('.timer-btn').forEach(b => {
 slider.value = config.rounds;
 roundVal.textContent = config.rounds;
 
+const showTranslationCheck = document.getElementById('showTranslationCheck');
+showTranslationCheck.checked = config.showTranslation;
+showTranslationCheck.addEventListener('change', () => {
+  config.showTranslation = showTranslationCheck.checked;
+  saveConfig();
+});
+
 document.getElementById('startBtn').addEventListener('click', () => {
   if (activeTab === 'quiz') startQuiz();
   else startSession();
@@ -530,7 +538,8 @@ function showCard() {
   flashCard.classList.remove('revealed');
   document.getElementById('koreanText').textContent = card.k;
   document.getElementById('romanText').textContent = card.r;
-  document.getElementById('meaningText').textContent = card.m || '';
+  document.getElementById('meaningText').textContent =
+    config.level >= 3 && !config.showTranslation ? '' : (card.m || '');
 
   flashCard.classList.remove('pop');
   void flashCard.offsetWidth; // reflow
@@ -700,7 +709,7 @@ let quizSession = { queue: [], idx: 0, results: [], timerHandle: null };
 
 function getOptionLabel(card) {
   if (config.level <= 2) return card.r;
-  return card.m ? `${card.r} (${card.m})` : card.r;
+  return config.showTranslation && card.m ? `${card.r} (${card.m})` : card.r;
 }
 
 function startQuiz() {
@@ -754,7 +763,6 @@ function showQuizQuestion() {
 
   document.getElementById('quizCounter').textContent = `${current} / ${total}`;
   document.getElementById('quizKoreanText').textContent = card.k;
-  document.getElementById('quizMeaning').style.display = 'none';
   document.getElementById('quizNextBtn').style.display = 'none';
   announce(`Question ${current} of ${total}.`);
 
