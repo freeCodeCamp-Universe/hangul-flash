@@ -699,9 +699,8 @@ document.getElementById('btnHome').addEventListener('click', () => {
 let quizSession = { queue: [], idx: 0, results: [], timerHandle: null };
 
 function getOptionLabel(card) {
-  if (config.level === 1) return card.r;
-  if (config.level === 2) return card.m ? `${card.r} · ${card.m}` : card.r;
-  return card.m;
+  if (config.level <= 2) return card.r;
+  return card.m ? `${card.r} (${card.m})` : card.r;
 }
 
 function startQuiz() {
@@ -755,6 +754,7 @@ function showQuizQuestion() {
 
   document.getElementById('quizCounter').textContent = `${current} / ${total}`;
   document.getElementById('quizKoreanText').textContent = card.k;
+  document.getElementById('quizMeaning').style.display = 'none';
   document.getElementById('quizNextBtn').style.display = 'none';
   announce(`Question ${current} of ${total}.`);
 
