@@ -122,7 +122,7 @@ function playWrong() {
 
 // ── Tab navigation ───────────────────────────────────────────────────────────
 
-let activeTab = 'practice';
+let activeTab = 'study';
 
 document.querySelectorAll('.nav-tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -132,17 +132,8 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
       t.setAttribute('aria-current', t === tab ? 'true' : 'false');
     });
     clearTimer();
-    if (activeTab === 'theory') {
-      show('theory');
-    } else if (activeTab === 'quiz') {
-      document.getElementById('timerCard').style.display = '';
-      document.getElementById('startBtn').textContent = 'Start Quiz →';
-      show('setup');
-    } else {
-      document.getElementById('timerCard').style.display = '';
-      document.getElementById('startBtn').textContent = 'Start Round →';
-      show('setup');
-    }
+    if (activeTab === 'theory') show('theory');
+    else show('setup');
   });
 });
 
@@ -355,7 +346,7 @@ const LEVEL_NAMES = { 1:'Letters', 2:'Syllables', 3:'Words', 4:'Sentences' };
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
-let config = { level: 1, timer: 0, rounds: 10, showTranslation: false };
+let config = { level: 1, timer: 0, rounds: 10, showTranslation: false, mode: 'reading' };
 let session = { queue: [], idx: 0, grades: [], timerHandle: null, timerRemaining: 0 };
 
 function saveConfig() {
@@ -370,6 +361,7 @@ function saveConfig() {
     if (saved.timer !== undefined) config.timer = saved.timer;
     if (saved.rounds) config.rounds = saved.rounds;
     if (saved.showTranslation !== undefined) config.showTranslation = saved.showTranslation;
+    if (saved.mode) config.mode = saved.mode;
   } catch (e) {}
 })();
 
@@ -477,12 +469,17 @@ document.querySelectorAll('.timer-btn').forEach(btn => {
   });
 });
 
-const slider = document.getElementById('roundSlider');
-const roundVal = document.getElementById('roundVal');
-slider.addEventListener('input', () => {
-  roundVal.textContent = slider.value;
-  config.rounds = +slider.value;
-  saveConfig();
+document.querySelectorAll('.round-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.round-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
+    config.rounds = +btn.dataset.rounds;
+    saveConfig();
+  });
 });
 
 // Apply loaded config to UI
@@ -496,8 +493,30 @@ document.querySelectorAll('.timer-btn').forEach(b => {
   b.classList.toggle('active', on);
   b.setAttribute('aria-pressed', on ? 'true' : 'false');
 });
-slider.value = config.rounds;
-roundVal.textContent = config.rounds;
+document.querySelectorAll('.round-btn').forEach(b => {
+  const on = +b.dataset.rounds === config.rounds;
+  b.classList.toggle('active', on);
+  b.setAttribute('aria-pressed', on ? 'true' : 'false');
+});
+
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
+    config.mode = btn.dataset.mode;
+    saveConfig();
+  });
+});
+
+document.querySelectorAll('.mode-btn').forEach(b => {
+  const on = b.dataset.mode === config.mode;
+  b.classList.toggle('active', on);
+  b.setAttribute('aria-pressed', on ? 'true' : 'false');
+});
 
 const showTranslationCheck = document.getElementById('showTranslationCheck');
 showTranslationCheck.checked = config.showTranslation;
@@ -507,7 +526,8 @@ showTranslationCheck.addEventListener('change', () => {
 });
 
 document.getElementById('startBtn').addEventListener('click', () => {
-  if (activeTab === 'quiz') startQuiz();
+  if (config.mode === 'quiz') startQuiz();
+  else if (config.mode === 'listening') startListening();
   else startSession();
 });
 
@@ -762,7 +782,13 @@ function showQuizQuestion() {
   const current = quizSession.idx + 1;
 
   document.getElementById('quizCounter').textContent = `${current} / ${total}`;
-  document.getElementById('quizKoreanText').textContent = card.k;
+  const qKoreanEl = document.getElementById('quizKoreanText');
+  qKoreanEl.textContent = card.k;
+  qKoreanEl.setAttribute('lang', 'ko');
+  document.getElementById('quizSpeakBtn').style.display = '';
+  const quizCardEl = document.querySelector('#quiz .quiz-card');
+  quizCardEl.style.cursor = '';
+  quizCardEl.onclick = null;
   document.getElementById('quizNextBtn').style.display = 'none';
   announce(`Question ${current} of ${total}.`);
 
@@ -771,13 +797,17 @@ function showQuizQuestion() {
   const options = shuffle([card, ...distractors]);
 
   const container = document.getElementById('quizOptions');
-  container.className = 'quiz-options' + (config.level <= 2 ? ' cols-2' : '');
+  container.className = 'quiz-options cols-2';
   container.innerHTML = '';
 
   options.forEach(opt => {
     const btn = document.createElement('button');
     btn.className = 'quiz-option';
-    btn.textContent = getOptionLabel(opt);
+    if (config.showTranslation && config.level === 4 && opt.m) {
+      btn.innerHTML = `<span>${opt.r}</span><span class="opt-hint">${opt.m}</span>`;
+    } else {
+      btn.textContent = getOptionLabel(opt);
+    }
     btn.dataset.k = opt.k;
     btn.addEventListener('click', () => handleOptionClick(btn, opt.k === card.k, card.k));
     container.appendChild(btn);
@@ -850,13 +880,18 @@ function showQuizResults() {
 
 document.getElementById('quizNextBtn').addEventListener('click', () => {
   quizSession.idx++;
-  if (quizSession.idx < quizSession.queue.length) showQuizQuestion();
-  else showQuizResults();
+  if (quizSession.idx < quizSession.queue.length) {
+    if (config.mode === 'listening') showListeningQuestion();
+    else showQuizQuestion();
+  } else {
+    showQuizResults();
+  }
 });
 
 document.getElementById('quizSpeakBtn').addEventListener('click', e => {
   e.stopPropagation();
-  speak(document.getElementById('quizKoreanText').textContent, e.currentTarget);
+  const el = document.getElementById('quizKoreanText');
+  speak(el.dataset.speak || el.textContent, e.currentTarget);
 });
 
 document.getElementById('quizLeaveBtn').addEventListener('click', () => { clearQuizTimer(); show('setup'); });
@@ -918,6 +953,74 @@ document.getElementById('theory').addEventListener('keydown', e => {
   const td = e.target.closest('.alpha-table td.char');
   if (td) { e.preventDefault(); speak(td.textContent.trim()); }
 });
+
+// ── Listening mode ────────────────────────────────────────────────────────────
+
+function startListening() {
+  const pool = DATA[config.level];
+  quizSession.queue = weightedQueue(pool, config.rounds);
+  quizSession.idx = 0;
+  quizSession.results = [];
+  show('quiz');
+  document.getElementById('quizLevelLabel').textContent =
+    `Level ${config.level} · ${LEVEL_NAMES[config.level]}`;
+  announce(`Listening started. Level ${config.level}. Question 1 of ${quizSession.queue.length}.`);
+  showListeningQuestion();
+}
+
+function showListeningQuestion() {
+  clearQuizTimer();
+  const card = quizSession.queue[quizSession.idx];
+  const total = quizSession.queue.length;
+  const current = quizSession.idx + 1;
+
+  document.getElementById('quizCounter').textContent = `${current} / ${total}`;
+  const koreanEl = document.getElementById('quizKoreanText');
+  koreanEl.textContent = '🔊';
+  koreanEl.removeAttribute('lang');
+  koreanEl.dataset.speak = card.k;
+  document.getElementById('quizMeaning').style.display = 'none';
+  document.getElementById('quizNextBtn').style.display = 'none';
+  document.getElementById('quizSpeakBtn').style.display = 'none';
+  const listeningCard = document.querySelector('#quiz .quiz-card');
+  listeningCard.style.cursor = 'pointer';
+  listeningCard.onclick = () => speak(card.k);
+  announce(`Question ${current} of ${total}. Listen and choose the correct character.`);
+
+  speak(card.k);
+
+  const pool = DATA[config.level];
+  const distractors = shuffle(pool.filter(c => c.k !== card.k)).slice(0, 3);
+  const options = shuffle([card, ...distractors]);
+
+  const container = document.getElementById('quizOptions');
+  container.className = 'quiz-options cols-2';
+  container.innerHTML = '';
+
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    if (config.showTranslation && config.level === 4 && opt.m) {
+      btn.innerHTML = `<span lang="ko">${opt.k}</span><span class="opt-hint">${opt.m}</span>`;
+    } else {
+      const suffix = config.showTranslation
+        ? (config.level >= 3 && opt.m ? ` (${opt.m})` : ` (${opt.r})`)
+        : '';
+      btn.textContent = opt.k + suffix;
+      btn.setAttribute('lang', 'ko');
+    }
+    btn.dataset.k = opt.k;
+    btn.addEventListener('click', () => handleOptionClick(btn, opt.k === card.k, card.k));
+    container.appendChild(btn);
+  });
+
+  if (config.timer > 0) {
+    document.getElementById('quizTimerBarWrap').style.display = 'block';
+    startQuizTimer(card.k);
+  } else {
+    document.getElementById('quizTimerBarWrap').style.display = 'none';
+  }
+}
 
 // ── Keyboard shortcuts modal ──────────────────────────────────────────────────
 

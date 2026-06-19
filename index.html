@@ -12,14 +12,15 @@
   <style>
     #setup {
       grid-template-columns: 1fr 1fr;
-      grid-template-areas: "level timer" "level cards" "start start" "toggle toggle";
+      grid-template-areas: "level mode" "level timer" "level cards" "start start" "toggle toggle";
       width: 100%;
       max-width: 860px;
       gap: 14px;
     }
     #setup > .card:first-child  { grid-area: level; }
-    #setup > .card:nth-child(2) { grid-area: timer; }
-    #setup > .card:nth-child(3) { grid-area: cards; }
+    #setup > .card:nth-child(2) { grid-area: mode; }
+    #setup > .card:nth-child(3) { grid-area: timer; }
+    #setup > .card:nth-child(4) { grid-area: cards; }
     #setup > .start-btn {
       grid-area: start;
       justify-self: center;
@@ -36,7 +37,7 @@
     @media (max-width: 480px) {
       #setup {
         grid-template-columns: 1fr;
-        grid-template-areas: "level" "timer" "cards" "start" "toggle";
+        grid-template-areas: "level" "mode" "timer" "cards" "start" "toggle";
         max-width: 520px;
       }
       #setup > .start-btn { width: 100%; justify-self: auto; }
@@ -66,9 +67,8 @@
 </header>
 
 <nav class="nav-tabs" aria-label="Sections">
-  <button class="nav-tab active" id="tab-practice" aria-current="true"  data-tab="practice">Practice</button>
-  <button class="nav-tab"        id="tab-quiz"     aria-current="false" data-tab="quiz">Quiz</button>
-  <button class="nav-tab"        id="tab-theory"   aria-current="false" data-tab="theory">Theory</button>
+  <button class="nav-tab active" id="tab-study"  aria-current="true"  data-tab="study">Study Mode</button>
+  <button class="nav-tab"        id="tab-theory" aria-current="false" data-tab="theory">Theory</button>
 </nav>
 
 <main id="main-content">
@@ -81,23 +81,28 @@
       <button class="level-btn active" data-level="1" aria-pressed="true">
         <div class="lv-example" lang="ko">ㄱ ㅏ ㄴ</div>
         <div class="lv-title">Letters</div>
-        <div class="lv-num">Level 1</div>
       </button>
       <button class="level-btn" data-level="2" aria-pressed="false">
         <div class="lv-example" lang="ko">한 가 나</div>
         <div class="lv-title">Syllables</div>
-        <div class="lv-num">Level 2</div>
       </button>
       <button class="level-btn" data-level="3" aria-pressed="false">
         <div class="lv-example" lang="ko">하늘 물</div>
         <div class="lv-title">Words</div>
-        <div class="lv-num">Level 3</div>
       </button>
       <button class="level-btn" data-level="4" aria-pressed="false">
         <div class="lv-example" lang="ko">안녕하세요</div>
         <div class="lv-title">Sentences</div>
-        <div class="lv-num">Level 4</div>
       </button>
+    </div>
+  </div>
+
+  <div class="card" id="modeCard">
+    <h2 id="mode-label">Mode</h2>
+    <div class="mode-group" role="group" aria-labelledby="mode-label">
+      <button class="mode-btn active" data-mode="reading"   aria-pressed="true">Reading</button>
+      <button class="mode-btn"        data-mode="quiz"      aria-pressed="false">Quiz</button>
+      <button class="mode-btn"        data-mode="listening" aria-pressed="false">Listening</button>
     </div>
   </div>
 
@@ -112,14 +117,17 @@
 
   <div class="card">
     <h2>Cards per round</h2>
-    <div class="round-group">
-      <label for="roundSlider">Cards</label>
-      <input type="range" id="roundSlider" min="5" max="30" step="5" value="10" />
-      <span id="roundVal">10</span>
+    <div class="round-group" role="group" aria-label="Cards per round">
+      <button class="round-btn" data-rounds="5"  aria-pressed="false">5</button>
+      <button class="round-btn" data-rounds="10" aria-pressed="true">10</button>
+      <button class="round-btn" data-rounds="15" aria-pressed="false">15</button>
+      <button class="round-btn" data-rounds="20" aria-pressed="false">20</button>
+      <button class="round-btn" data-rounds="25" aria-pressed="false">25</button>
+      <button class="round-btn" data-rounds="30" aria-pressed="false">30</button>
     </div>
   </div>
 
-  <button class="start-btn" id="startBtn">Start Round →</button>
+  <button class="start-btn" id="startBtn">Start →</button>
   <label class="toggle-label" id="showTranslationToggle">
     <input type="checkbox" id="showTranslationCheck" />
     Show translation
@@ -165,8 +173,10 @@
     <h2>Review these</h2>
     <div class="missed-items" id="missedItems"></div>
   </div>
-  <button class="btn-next" id="btnRetry">Next round</button>
-  <button class="leave-btn" id="btnHome">Back to menu</button>
+  <div class="result-btns">
+    <button class="btn-next" id="btnRetry">Next round</button>
+    <button class="leave-btn" id="btnHome">Back to menu</button>
+  </div>
 </div>
 
 <!-- Quiz -->
@@ -198,8 +208,10 @@
     <h2>Review these</h2>
     <div class="missed-items" id="quizMissedItems"></div>
   </div>
-  <button class="btn-next" id="quizBtnRetry">Next round</button>
-  <button class="leave-btn" id="quizBtnHome">Back to menu</button>
+  <div class="result-btns">
+    <button class="btn-next" id="quizBtnRetry">Next round</button>
+    <button class="leave-btn" id="quizBtnHome">Back to menu</button>
+  </div>
 </div>
 
 <!-- Theory -->

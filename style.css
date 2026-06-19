@@ -160,13 +160,14 @@ header p {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  flex: 1;
 }
 
 .level-btn {
   background: var(--surface2);
   border: 2px solid var(--border);
   border-radius: 12px;
-  padding: 14px 10px;
+  padding: 8px 6px;
   cursor: pointer;
   color: var(--text);
   text-align: center;
@@ -194,16 +195,9 @@ header p {
   font-weight: 700;
 }
 
-.level-btn .lv-num {
-  font-size: 0.65rem;
-  color: var(--muted);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-top: 2px;
-}
 
-.timer-group {
+.timer-group,
+.mode-group {
   flex: 1;
   display: flex;
   flex-wrap: wrap;
@@ -211,7 +205,8 @@ header p {
   gap: 10px;
 }
 
-.timer-btn {
+.timer-btn,
+.mode-btn {
   flex: 1;
   background: var(--surface2);
   border: 2px solid var(--border);
@@ -224,29 +219,34 @@ header p {
   transition: border-color 0.15s, background 0.15s;
 }
 
-.timer-btn:hover { border-color: var(--purple); }
-.timer-btn.active { border-color: var(--purple); background: var(--tint-purple); }
+.timer-btn:hover,
+.mode-btn:hover { border-color: var(--purple); }
+.timer-btn.active,
+.mode-btn.active { border-color: var(--purple); background: var(--tint-purple); }
 
 .round-group {
   flex: 1;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 }
 
-.round-group label { color: var(--muted); font-size: 1rem; }
-
-.round-group input[type=range] {
+.round-btn {
   flex: 1;
-  accent-color: var(--purple);
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 600;
+  transition: border-color 0.15s, background 0.15s;
 }
 
-.round-group span {
-  font-weight: 700;
-  color: var(--purple);
-  min-width: 32px;
-  text-align: right;
-}
+.round-btn:hover { border-color: var(--purple); }
+.round-btn.active { border-color: var(--purple); background: var(--tint-purple); }
 
 .start-btn {
   width: 100%;
@@ -549,8 +549,17 @@ header p {
   color: var(--text);
 }
 
-.btn-next {
+.result-btns {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   width: 100%;
+}
+
+.btn-next {
+  width: 50%;
+  min-width: 200px;
   padding: 14px;
   border-radius: 12px;
   background: var(--yellow-gold);
@@ -812,11 +821,31 @@ header p {
 }
 
 .quiz-option:hover:not(:disabled) { border-color: var(--purple); }
+
+.quiz-option .opt-hint {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--muted);
+  margin-top: 3px;
+}
 .quiz-option:disabled { cursor: default; }
 .quiz-option.correct { border-color: var(--green); background: var(--tint-green); color: var(--green); }
-.quiz-option.correct::after { content: ' ✓'; }
 .quiz-option.wrong   { border-color: var(--red);   background: var(--tint-red);   color: var(--red); }
-.quiz-option.wrong::after   { content: ' ✗'; }
+
+.quiz-option.correct,
+.quiz-option.wrong { position: relative; }
+
+.quiz-option.correct::after,
+.quiz-option.wrong::after {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 0.75rem;
+}
+
+.quiz-option.correct::after { content: '✓'; }
+.quiz-option.wrong::after   { content: '✗'; }
 
 .quiz-next-btn {
   width: 100%;
