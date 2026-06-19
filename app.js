@@ -509,6 +509,8 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
     btn.setAttribute('aria-pressed', 'true');
     config.mode = btn.dataset.mode;
     saveConfig();
+    const modeNames = { reading: 'Reading', quiz: 'Quiz', listening: 'Listening' };
+    announce(`Mode: ${modeNames[config.mode]}`);
   });
 });
 
@@ -543,7 +545,7 @@ function startSession() {
   show('flash');
   document.getElementById('levelLabel').textContent =
     `Level ${config.level} · ${LEVEL_NAMES[config.level]}`;
-  announce(`Practice started. Level ${config.level}, ${LEVEL_NAMES[config.level]}. Card 1 of ${session.queue.length}.`);
+  announce(`Reading started. Level ${config.level}, ${LEVEL_NAMES[config.level]}. Card 1 of ${session.queue.length}.`);
   showCard();
 }
 

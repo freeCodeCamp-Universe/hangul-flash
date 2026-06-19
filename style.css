@@ -915,8 +915,7 @@ header p {
   z-index: 300;
   background: rgba(10, 10, 35, 0.75);
   justify-content: center;
-  align-items: flex-start;
-  padding-top: 72px;
+  align-items: center;
 }
 
 .shortcuts-modal.open { display: flex; }
