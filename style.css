@@ -179,7 +179,8 @@ header p {
   border-color: var(--purple);
   background: var(--tint-purple);
 }
-.level-btn.active .lv-example { color: var(--purple); }
+.level-btn.active .lv-example,
+.level-btn.active .lv-title { color: var(--purple); }
 
 .level-btn .lv-example {
   font-size: 1.6rem;
@@ -219,10 +220,19 @@ header p {
   transition: border-color 0.15s, background 0.15s;
 }
 
+.mode-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.mode-emoji { font-size: 1.4rem; line-height: 1; }
+
 .timer-btn:hover,
 .mode-btn:hover { border-color: var(--purple); }
 .timer-btn.active,
-.mode-btn.active { border-color: var(--purple); background: var(--tint-purple); }
+.mode-btn.active { border-color: var(--purple); background: var(--tint-purple); color: var(--purple); }
 
 .round-group {
   flex: 1;
@@ -246,7 +256,7 @@ header p {
 }
 
 .round-btn:hover { border-color: var(--purple); }
-.round-btn.active { border-color: var(--purple); background: var(--tint-purple); }
+.round-btn.active { border-color: var(--purple); background: var(--tint-purple); color: var(--purple); }
 
 .start-btn {
   width: 100%;
@@ -308,6 +318,13 @@ header p {
   background: var(--track);
   border-radius: 4px;
   overflow: hidden;
+}
+
+.prog-inline {
+  flex: 1;
+  max-width: 140px;
+  margin-left: 12px;
+  height: 6px;
 }
 
 .progress-bar-fill {
@@ -615,6 +632,7 @@ header p {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
   transition: background 0.15s, color 0.15s;
 }
 
@@ -1044,6 +1062,19 @@ kbd {
   .alpha-grid.cols-4,
   .alpha-grid.cols-3 { grid-template-columns: repeat(2, 1fr); }
 
+
+  /* Nav tabs: meet 44px touch target */
+  .nav-tab { min-height: 44px; }
+
+  /* Setup controls: meet 44px touch target */
+  .timer-btn,
+  .mode-btn { min-height: 44px; }
+
+  /* Round buttons: wrap to 3 per row with adequate touch target */
+  .round-btn {
+    flex: 1 1 calc(33.33% - 7px);
+    min-height: 44px;
+  }
 
   /* Quiz: always single column on mobile for larger tap targets */
   .quiz-options.cols-2 { grid-template-columns: 1fr; }

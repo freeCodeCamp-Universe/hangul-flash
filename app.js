@@ -422,11 +422,14 @@ const SCREEN_TITLES = {
 
 let _firstShow = true;
 
+const PLAY_SCREENS = new Set(['flash', 'results', 'quiz', 'quizResults']);
+
 function show(id) {
   SCREENS.forEach(s => {
     const el = document.getElementById(s);
     if (el) el.style.display = s === id ? (SCREEN_DISPLAY[s] || 'flex') : 'none';
   });
+  document.querySelector('.nav-tabs').style.display = PLAY_SCREENS.has(id) ? 'none' : '';
   document.title = SCREEN_TITLES[id] || '한글 Flash';
   if (!_firstShow) {
     const el = document.getElementById(id);
@@ -543,8 +546,6 @@ function startSession() {
   session.requeued = new Set();
   session.total = session.queue.length;
   show('flash');
-  document.getElementById('levelLabel').textContent =
-    `Level ${config.level} · ${LEVEL_NAMES[config.level]}`;
   announce(`Reading started. Level ${config.level}, ${LEVEL_NAMES[config.level]}. Card 1 of ${session.queue.length}.`);
   showCard();
 }
@@ -740,8 +741,6 @@ function startQuiz() {
   quizSession.idx = 0;
   quizSession.results = [];
   show('quiz');
-  document.getElementById('quizLevelLabel').textContent =
-    `Level ${config.level} · ${LEVEL_NAMES[config.level]}`;
   announce(`Quiz started. Level ${config.level}, ${LEVEL_NAMES[config.level]}. Question 1 of ${quizSession.queue.length}.`);
   showQuizQuestion();
 }
@@ -784,6 +783,7 @@ function showQuizQuestion() {
   const current = quizSession.idx + 1;
 
   document.getElementById('quizCounter').textContent = `${current} / ${total}`;
+
   const qKoreanEl = document.getElementById('quizKoreanText');
   qKoreanEl.textContent = card.k;
   qKoreanEl.setAttribute('lang', 'ko');
@@ -964,8 +964,6 @@ function startListening() {
   quizSession.idx = 0;
   quizSession.results = [];
   show('quiz');
-  document.getElementById('quizLevelLabel').textContent =
-    `Level ${config.level} · ${LEVEL_NAMES[config.level]}`;
   announce(`Listening started. Level ${config.level}. Question 1 of ${quizSession.queue.length}.`);
   showListeningQuestion();
 }
@@ -977,6 +975,7 @@ function showListeningQuestion() {
   const current = quizSession.idx + 1;
 
   document.getElementById('quizCounter').textContent = `${current} / ${total}`;
+
   const koreanEl = document.getElementById('quizKoreanText');
   koreanEl.textContent = '🔊';
   koreanEl.removeAttribute('lang');

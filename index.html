@@ -100,9 +100,9 @@
   <div class="card" id="modeCard">
     <h2 id="mode-label">Mode</h2>
     <div class="mode-group" role="group" aria-labelledby="mode-label">
-      <button class="mode-btn active" data-mode="reading"   aria-pressed="true">Reading</button>
-      <button class="mode-btn"        data-mode="quiz"      aria-pressed="false">Quiz</button>
-      <button class="mode-btn"        data-mode="listening" aria-pressed="false">Listening</button>
+      <button class="mode-btn active" data-mode="reading"   aria-pressed="true"><span class="mode-emoji">📖</span><span>Reading</span></button>
+      <button class="mode-btn"        data-mode="quiz"      aria-pressed="false"><span class="mode-emoji">🎯</span><span>Quiz</span></button>
+      <button class="mode-btn"        data-mode="listening" aria-pressed="false"><span class="mode-emoji">🎧</span><span>Listening</span></button>
     </div>
   </div>
 
@@ -137,8 +137,8 @@
 <!-- Flash -->
 <div id="flash" tabindex="-1">
   <div class="progress-row">
+    <button class="leave-btn" id="btnLeave">← Leave</button>
     <span id="cardCounter">1 / 10</span>
-    <span id="levelLabel">Level 1 · Letters</span>
   </div>
   <div class="timer-bar-wrap" id="timerBarWrap" style="display:none">
     <div class="timer-bar-fill" id="timerBar" style="width:100%"></div>
@@ -155,7 +155,6 @@
     <button class="grade-btn ok"   id="btnOk"   aria-disabled="true">😐 OK</button>
     <button class="grade-btn easy" id="btnEasy"  aria-disabled="true">😊 Easy</button>
   </div>
-  <button class="leave-btn" id="btnLeave">← Leave round</button>
 </div>
 
 <!-- Results -->
@@ -182,8 +181,8 @@
 <!-- Quiz -->
 <div id="quiz" tabindex="-1">
   <div class="progress-row">
+    <button class="leave-btn" id="quizLeaveBtn">← Leave</button>
     <span id="quizCounter">1 / 10</span>
-    <span id="quizLevelLabel">Level 1 · Letters</span>
   </div>
   <div class="timer-bar-wrap" id="quizTimerBarWrap" style="display:none">
     <div class="timer-bar-fill" id="quizTimerBar" style="width:100%"></div>
@@ -195,7 +194,6 @@
   </div>
   <div class="quiz-options" id="quizOptions"></div>
   <button class="quiz-next-btn" id="quizNextBtn" style="display:none">Next →</button>
-  <button class="leave-btn" id="quizLeaveBtn">← Leave quiz</button>
 </div>
 
 <!-- Quiz results -->
